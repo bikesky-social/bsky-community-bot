@@ -53,11 +53,14 @@ export class UnlabelCommand extends Command {
         labelListString = labelListString.concat(labelString);
         removeIndexes.push(`${i + 1}`);
       }
-      await post.reply({
-        text: `here is a list of the labels on your account:\n\n${labelListString}\nplease reply with the numbers of the labels you would like separated by commas. for example, if you want to remove all of them, reply with "${removeIndexes.join(
-          ","
-        )}"`,
-      });
+      await post.reply(
+        {
+          text: `here is a list of the labels on your account:\n\n${labelListString}\nplease reply with the numbers of the labels you would like separated by commas. for example, if you want to remove all of them, reply with "${removeIndexes.join(
+            ","
+          )}"`,
+        },
+        { splitLongPost: true }
+      );
 
       return {
         command: UnlabelCommand.commandName,
@@ -186,9 +189,12 @@ export class UnlabelCommand extends Command {
         const removedLabelNameString = appliedLabelNames.join(", ");
         try {
           // reply that we applied the following labels: xxx
-          await reply.reply({
-            text: `okay i have removed these labels from your account: ${removedLabelNameString}\n\nif you ever want to add more labels, you can do so by sending me a post that says 'label'`,
-          });
+          await reply.reply(
+            {
+              text: `okay i have removed these labels from your account: ${removedLabelNameString}\n\nif you ever want to add more labels, you can do so by sending me a post that says 'label'`,
+            },
+            { splitLongPost: true }
+          );
         } catch (error) {
           console.log(
             `unable to respond about removing labels: ${JSON.stringify(error)}`
