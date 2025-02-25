@@ -14,7 +14,10 @@ export class LabelCommand extends Command {
   static commandDescription = "add labels to your account";
   static maxLabels = -1;
 
-  static async registerCommand(cmap: CommandMap, blueskyCommunityBot: BlueskyCommunityBot) {
+  static async registerCommand(
+    cmap: CommandMap,
+    blueskyCommunityBot: BlueskyCommunityBot
+  ) {
     super.registerCommand(cmap, blueskyCommunityBot);
 
     LabelCommand.maxLabels =
@@ -24,7 +27,10 @@ export class LabelCommand extends Command {
   }
 
   async validateCommand(): Promise<CommandValidationResult> {
-    if (LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.hasValidSelfServeLabels) {
+    if (
+      LabelCommand.blueskyCommunityBot.labelPoliciesKeeper
+        .hasValidSelfServeLabels
+    ) {
       const selfServeLabels =
         await LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getTargetSelfServeLabels(
           this.rootPost.author.did
@@ -56,23 +62,42 @@ export class LabelCommand extends Command {
     const example2 = "fietser";
     const example3 = "safe-streets";
 
-    const postText = `let's get you some bike labels!\n\nhere's a list of our labels. please reply with the numbers of the labels you would like separated by commas. for example, if you want ${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(example1, LabelCommand.blueskyCommunityBot.options.labelLocale)}, ${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(example2, LabelCommand.blueskyCommunityBot.options.labelLocale)} and ${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(example3, LabelCommand.blueskyCommunityBot.options.labelLocale)}, reply with "${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.get1BasedLabelIndex(example1)}, ${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.get1BasedLabelIndex(example2)}, ${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.get1BasedLabelIndex(example3)}"\n\n*labels with asterisks will require a manual verification step`;
+    const locales = post.langs
+      ? post.langs
+      : [LabelCommand.blueskyCommunityBot.options.defaultLabelLocale];
+
+    const postText = `let's get you some bike labels!\n\nhere's a list of our labels. please reply with the numbers of the labels you would like separated by commas. for example, if you want ${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(
+      example1,
+      locales
+    )}, ${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(
+      example2,
+      locales
+    )} and ${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(
+      example3,
+      locales
+    )}, reply with "${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.get1BasedLabelIndex(
+      example1
+    )}, ${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.get1BasedLabelIndex(
+      example2
+    )}, ${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.get1BasedLabelIndex(
+      example3
+    )}"\n\n*labels with asterisks will require a manual verification step`;
+
+    const imagePayload =
+      await LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelOptionsImagePayload(
+        locales
+      );
 
     await post.reply({
       text: postText,
       images: [
         {
-          data: LabelCommand.blueskyCommunityBot.labelPoliciesKeeper
-            .labelOptionsCanvasBlob,
+          data: imagePayload.labelOptionsCanvasBlob,
           aspectRatio: {
-            width:
-              LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.labelOptionsCanvas
-                .width,
-            height:
-              LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.labelOptionsCanvas
-                .height,
+            width: imagePayload.labelOptionsCanvas.width,
+            height: imagePayload.labelOptionsCanvas.height,
           },
-          alt: LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.labelOptionsAltText,
+          alt: imagePayload.labelOptionsAltText,
         },
       ],
     });
@@ -107,7 +132,8 @@ export class LabelCommand extends Command {
         );
 
       const maxChoice =
-        LabelCommand.blueskyCommunityBot.options.selfServeLabelIdentifiers.length;
+        LabelCommand.blueskyCommunityBot.options.selfServeLabelIdentifiers
+          .length;
 
       const indexList: number[] = [];
       reply.text
@@ -149,13 +175,18 @@ export class LabelCommand extends Command {
             for (let j = 0; j < selfServeLabels.length; j++) {
               const selfServeLabelIdentifier = selfServeLabels[j].val;
               if (
-                LabelCommand.blueskyCommunityBot.options.selfServeLabelIdentifiers[
-                  labelIndex - 1
-                ] === selfServeLabelIdentifier
+                LabelCommand.blueskyCommunityBot.options
+                  .selfServeLabelIdentifiers[labelIndex - 1] ===
+                selfServeLabelIdentifier
               ) {
                 // invalid response - they already have this label
                 await reply.reply({
-                  text: `you already have one of these labels (${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(selfServeLabelIdentifier, LabelCommand.blueskyCommunityBot.options.labelLocale)}). can you please try again?`,
+                  text: `you already have one of these labels (${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(
+                    selfServeLabelIdentifier,
+                    reply.langs
+                      ? reply.langs
+                      : [LabelCommand.blueskyCommunityBot.options.defaultLabelLocale]
+                  )}). can you please try again?`,
                 });
                 return stillWaitingResponse;
               }
@@ -182,7 +213,11 @@ export class LabelCommand extends Command {
           return stillWaitingResponse;
         }
       } catch (error) {
-        console.log(`unable to validate or respond to label selections: ${JSON.stringify(error)}`);
+        console.log(
+          `unable to validate or respond to label selections: ${JSON.stringify(
+            error
+          )}`
+        );
         return stillWaitingResponse;
       }
 
@@ -222,7 +257,9 @@ export class LabelCommand extends Command {
         const appliedLabelNames =
           LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelNames(
             labelsToApply,
-            LabelCommand.blueskyCommunityBot.options.labelLocale
+            reply.langs
+              ? reply.langs
+              : [LabelCommand.blueskyCommunityBot.options.defaultLabelLocale]
           );
         const appliedLabelNameString = appliedLabelNames.join(", ");
         try {
@@ -242,7 +279,9 @@ export class LabelCommand extends Command {
             });
           }
         } catch (error) {
-          console.log(`unable to respond about applying labels: ${JSON.stringify(error)}`);
+          console.log(
+            `unable to respond about applying labels: ${JSON.stringify(error)}`
+          );
           return conversationClosedResponse;
         }
       } else if (labelsAwaitingVerification.length > 0) {
@@ -256,7 +295,9 @@ export class LabelCommand extends Command {
             text: `to continue the verification process, can you send an email to ${LabelCommand.blueskyCommunityBot.options.labelVerificationEmail} that includes:\n\n1. your Bluesky handle\n2. the verified label you would like\n\nit helps if the email comes from a domain that relates to the label, but if that isn't possible, we can still figure it out`,
           });
         } catch (error) {
-          console.log(`unable to respond about verified labels: ${JSON.stringify(error)}`);
+          console.log(
+            `unable to respond about verified labels: ${JSON.stringify(error)}`
+          );
           return conversationClosedResponse;
         }
       }

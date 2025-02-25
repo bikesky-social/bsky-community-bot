@@ -18,7 +18,7 @@ type BlueskyCommunityBotOptions = {
   port: number;
   conversationCollection: string;
   labelVerificationEmail: string;
-  labelLocale: string;
+  defaultLabelLocale: string;
   maxPostLength: number;
 };
 

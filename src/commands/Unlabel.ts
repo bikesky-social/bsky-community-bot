@@ -12,7 +12,10 @@ export class UnlabelCommand extends Command {
   static commandDescription = "remove labels from your account";
 
   async validateCommand(): Promise<CommandValidationResult> {
-    if (UnlabelCommand.blueskyCommunityBot.labelPoliciesKeeper.hasValidSelfServeLabels) {
+    if (
+      UnlabelCommand.blueskyCommunityBot.labelPoliciesKeeper
+        .hasValidSelfServeLabels
+    ) {
       this.validCommand = true;
       return {
         valid: true,
@@ -39,12 +42,21 @@ export class UnlabelCommand extends Command {
 
       for (let i = 0; i < selfServeLabels.length; i++) {
         const selfServeLabel = selfServeLabels[i];
-        const labelString = `${i + 1}. ${UnlabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(selfServeLabel.val, UnlabelCommand.blueskyCommunityBot.options.labelLocale)}\n`;
+        const labelString = `${
+          i + 1
+        }. ${UnlabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(
+          selfServeLabel.val,
+          post.langs
+            ? post.langs
+            : [UnlabelCommand.blueskyCommunityBot.options.defaultLabelLocale]
+        )}\n`;
         labelListString = labelListString.concat(labelString);
         removeIndexes.push(`${i + 1}`);
       }
       await post.reply({
-        text: `here is a list of the labels on your account:\n\n${labelListString}\nplease reply with the numbers of the labels you would like separated by commas. for example, if you want to remove all of them, reply with "${removeIndexes.join(",")}"`,
+        text: `here is a list of the labels on your account:\n\n${labelListString}\nplease reply with the numbers of the labels you would like separated by commas. for example, if you want to remove all of them, reply with "${removeIndexes.join(
+          ","
+        )}"`,
       });
 
       return {
@@ -136,7 +148,11 @@ export class UnlabelCommand extends Command {
           return stillWaitingResponse;
         }
       } catch (error) {
-        console.log(`unable to validate or respond to label selections: ${JSON.stringify(error)}`);
+        console.log(
+          `unable to validate or respond to label selections: ${JSON.stringify(
+            error
+          )}`
+        );
         return stillWaitingResponse;
       }
 
@@ -144,8 +160,7 @@ export class UnlabelCommand extends Command {
 
       for (let i = 0; i < indexList.length; i++) {
         const labelIndex = indexList[i] - 1;
-        const labelIdentifier =
-        selfServeLabels[labelIndex];
+        const labelIdentifier = selfServeLabels[labelIndex];
 
         labelsToRemove.push(labelIdentifier.val);
       }
@@ -164,7 +179,9 @@ export class UnlabelCommand extends Command {
         const appliedLabelNames =
           UnlabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelNames(
             labelsToRemove,
-            UnlabelCommand.blueskyCommunityBot.options.labelLocale
+            reply.langs
+              ? reply.langs
+              : [UnlabelCommand.blueskyCommunityBot.options.defaultLabelLocale]
           );
         const removedLabelNameString = appliedLabelNames.join(", ");
         try {
@@ -173,7 +190,9 @@ export class UnlabelCommand extends Command {
             text: `okay i have removed these labels from your account: ${removedLabelNameString}\n\nif you ever want to add more labels, you can do so by sending me a post that says 'label'`,
           });
         } catch (error) {
-          console.log(`unable to respond about removing labels: ${JSON.stringify(error)}`);
+          console.log(
+            `unable to respond about removing labels: ${JSON.stringify(error)}`
+          );
           return conversationClosedResponse;
         }
       }

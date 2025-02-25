@@ -7,15 +7,18 @@ import { Canvas, loadImage } from "canvas";
 import opentype from "opentype.js";
 import drawText from "node-canvas-text";
 
+type LabelOptionsImagePayload = {
+  labelOptionsCanvas: Canvas;
+  labelOptionsCanvasBlob: Blob;
+  labelOptionsAltText: string;
+};
+
 export class LabelPoliciesKeeper {
   readonly blueskyCommunityBot: BlueskyCommunityBot;
   labelerPolicies: LabelerPolicies = {
     labelValues: [],
     labelValueDefinitions: [],
   };
-  labelOptionsCanvas: Canvas = new Canvas(1, 1);
-  labelOptionsCanvasBlob: Blob = new Blob();
-  labelOptionsAltText: string = "";
   hasValidSelfServeLabels: boolean = false;
 
   constructor(blueskyCommunityBot: BlueskyCommunityBot) {
@@ -62,9 +65,10 @@ export class LabelPoliciesKeeper {
 
   validateVerifiedLabels(): boolean {
     // ensure verified labels are in label defs
-    const labelsNotFoundInDefs = this.blueskyCommunityBot.options.verifiedLabels.filter(
-      (x) => !this.labelerPolicies.labelValues.includes(x)
-    );
+    const labelsNotFoundInDefs =
+      this.blueskyCommunityBot.options.verifiedLabels.filter(
+        (x) => !this.labelerPolicies.labelValues.includes(x)
+      );
 
     if (labelsNotFoundInDefs.length != 0) {
       console.log(
@@ -76,7 +80,10 @@ export class LabelPoliciesKeeper {
     // ensure verified labels are in the list of self serve labels
     const labelsNotFoundInSelfServeLabelIdentifiers =
       this.blueskyCommunityBot.options.verifiedLabels.filter(
-        (x) => !this.blueskyCommunityBot.options.selfServeLabelIdentifiers.includes(x)
+        (x) =>
+          !this.blueskyCommunityBot.options.selfServeLabelIdentifiers.includes(
+            x
+          )
       );
 
     if (labelsNotFoundInSelfServeLabelIdentifiers.length != 0) {
@@ -121,7 +128,6 @@ export class LabelPoliciesKeeper {
         this.hasValidSelfServeLabels = true;
       }
 
-      await this.updateLabelOptionsImage();
       return true;
     } catch (error) {
       return false;
@@ -153,14 +159,22 @@ export class LabelPoliciesKeeper {
     return new Blob([ia], { type: mimeString });
   }
 
-  async updateLabelOptionsImage() {
+  async getLabelOptionsImagePayload(
+    locales: string[]
+  ): Promise<LabelOptionsImagePayload> {
+    const payload: LabelOptionsImagePayload = {
+      labelOptionsAltText: "",
+      labelOptionsCanvas: new Canvas(1, 1),
+      labelOptionsCanvasBlob: new Blob(),
+    };
+
     const width = 1290;
     const marginVertical = 200;
     const marginHorizontal = 50;
     const innerMarginVertical = 10;
     const innerMarginHorizontal = 10;
 
-    this.labelOptionsAltText = `image with a title: ${this.blueskyCommunityBot.labelerBot.profile.displayName}.\nbeneath the title is a list of numbered options:`;
+    payload.labelOptionsAltText = `image with a title: ${this.blueskyCommunityBot.labelerBot.profile.displayName}.\nbeneath the title is a list of numbered options:`;
 
     if (this.labelerPolicies.labelValueDefinitions) {
       const font = await opentype.load("./fonts/InterVariable.ttf");
@@ -172,8 +186,8 @@ export class LabelPoliciesKeeper {
       const rowHeight = 60;
       const height = 281 + rowHeight * rows;
 
-      this.labelOptionsCanvas = new Canvas(width, height);
-      const context = this.labelOptionsCanvas.getContext("2d");
+      payload.labelOptionsCanvas = new Canvas(width, height);
+      const context = payload.labelOptionsCanvas.getContext("2d");
 
       // draw background
 
@@ -210,15 +224,15 @@ export class LabelPoliciesKeeper {
           continue;
         }
 
-        const labelLocale = label.locales[0];
-        const labelText = this.blueskyCommunityBot.options.verifiedLabels.includes(
-          label.identifier
-        )
-          ? `${labelLocale.name}*`
-          : labelLocale.name;
+        const labelText =
+          this.blueskyCommunityBot.options.verifiedLabels.includes(
+            label.identifier
+          )
+            ? `${this.getLabelName(label.identifier, locales)}*`
+            : this.getLabelName(label.identifier, locales);
         const labelName = `${i + 1}. ${labelText}`;
 
-        this.labelOptionsAltText = this.labelOptionsAltText.concat(
+        payload.labelOptionsAltText = payload.labelOptionsAltText.concat(
           `\n${labelName}`
         );
 
@@ -249,14 +263,14 @@ export class LabelPoliciesKeeper {
         const textRect = {
           x:
             i % 2
-              ? this.labelOptionsCanvas.width / 2 + innerMarginHorizontal
+              ? payload.labelOptionsCanvas.width / 2 + innerMarginHorizontal
               : marginHorizontal + innerMarginHorizontal,
           y:
             i % 2
               ? marginVertical + innerMarginVertical + ((i - 1) / 2) * rowHeight
               : marginVertical + innerMarginVertical + (i / 2) * rowHeight,
           width:
-            this.labelOptionsCanvas.width / 2 -
+            payload.labelOptionsCanvas.width / 2 -
             marginHorizontal -
             innerMarginHorizontal * 2,
           height: rowHeight - innerMarginVertical * 2,
@@ -277,7 +291,8 @@ export class LabelPoliciesKeeper {
 
       // draw labeler display name
 
-      const displayName = this.blueskyCommunityBot.labelerBot.profile.displayName
+      const displayName = this.blueskyCommunityBot.labelerBot.profile
+        .displayName
         ? this.blueskyCommunityBot.labelerBot.profile.displayName
         : "";
 
@@ -334,16 +349,23 @@ export class LabelPoliciesKeeper {
       );
     }
 
-    this.labelOptionsCanvasBlob = this.dataURItoBlob(
-      this.labelOptionsCanvas.toDataURL()
+    payload.labelOptionsCanvasBlob = this.dataURItoBlob(
+      payload.labelOptionsCanvas.toDataURL()
     );
 
-    console.log("updated label options image");
+    console.log(`generated label options image for locales: ${locales}`);
+
+    return payload;
   }
 
   async getLabelImageRoute(req: Request, res: Response) {
+    const imageOptionsPayload = await this.getLabelOptionsImagePayload(
+      req.params["locale"]
+        ? [req.params["locale"] as string]
+        : [this.blueskyCommunityBot.options.defaultLabelLocale]
+    );
     res.type("png");
-    res.end(this.labelOptionsCanvas.toBuffer("image/png"));
+    res.end(imageOptionsPayload.labelOptionsCanvas.toBuffer("image/png"));
   }
 
   async getTargetSelfServeLabels(
@@ -353,7 +375,8 @@ export class LabelPoliciesKeeper {
       .get("app.bsky.actor.getProfile", {
         params: { actor: did },
         headers: {
-          "atproto-accept-labelers": this.blueskyCommunityBot.labelerBot.profile.did,
+          "atproto-accept-labelers":
+            this.blueskyCommunityBot.labelerBot.profile.did,
         },
       })
       .catch((e) => {
@@ -400,36 +423,43 @@ export class LabelPoliciesKeeper {
     return -1;
   }
 
-  getLabelName(labelIdentifier: string, locale: string): string | undefined {
+  getLabelName(labelIdentifier: string, locales: string[]): string | undefined {
     if (this.labelerPolicies.labelValueDefinitions) {
-      for (
-        let i = 0;
-        i < this.labelerPolicies.labelValueDefinitions?.length;
-        i++
-      ) {
-        const labelDef = this.labelerPolicies.labelValueDefinitions[i];
-        if (labelDef.identifier === labelIdentifier) {
-          for (let j = 0; j < labelDef.locales.length; j++) {
-            const labelLocale = labelDef.locales[j];
+      for (let localeIndex = 0; localeIndex < locales.length; localeIndex++) {
+        const desiredLocale = locales[localeIndex];
 
-            if (labelLocale.lang === locale) {
-              return labelLocale.name;
+        for (
+          let i = 0;
+          i < this.labelerPolicies.labelValueDefinitions?.length;
+          i++
+        ) {
+          const labelDef = this.labelerPolicies.labelValueDefinitions[i];
+          if (labelDef.identifier === labelIdentifier) {
+            for (let j = 0; j < labelDef.locales.length; j++) {
+              const labelLocale = labelDef.locales[j];
+
+              if (
+                labelLocale.lang.toLowerCase() === desiredLocale.toLowerCase()
+              ) {
+                return labelLocale.name;
+              }
             }
           }
         }
       }
     }
+
     return undefined;
   }
 
   getLabelNames(
     labelIdentifiers: string[],
-    locale: string
+    locales: string[]
   ): (string | undefined)[] {
     const labelNames: (string | undefined)[] = [];
 
     for (let i = 0; i < labelIdentifiers.length; i++) {
-      labelNames.push(this.getLabelName(labelIdentifiers[i], locale));
+      labelNames.push(this.getLabelName(labelIdentifiers[i], locales));
     }
 
     return labelNames;
