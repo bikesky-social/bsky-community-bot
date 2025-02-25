@@ -1,27 +1,20 @@
 import { BlueskyCommunityBot } from "./BlueskyCommunityBot";
-
-const selfServeLabels = process.env.SELF_SERVE_LABEL_IDENTIFIERS
-  ? (process.env.SELF_SERVE_LABEL_IDENTIFIERS as string).split(",")
-  : [];
-
-const verifiedLabels = process.env.VERIFIED_LABELS
-  ? (process.env.VERIFIED_LABELS as string).split(",")
-  : [];
+import { Env } from "./Env";
 
 const blueskyCommunityBot = new BlueskyCommunityBot({
-  botBskyUsername: process.env.BOT_BSKY_USERNAME as string,
-  botBskyPassword: process.env.BOT_BSKY_PASSWORD as string,
-  labelerBskyUsername: process.env.LABELER_BSKY_USERNAME as string,
-  labelerBskyPassword: process.env.LABELER_BSKY_PASSWORD as string,
-  labelerDid: process.env.LABELER_DID as string,
-  maxLabels: Number(process.env.MAX_LABELS),
-  selfServeLabelIdentifiers: selfServeLabels,
-  verifiedLabels: verifiedLabels,
-  port: Number(process.env.PORT),
-  conversationCollection: process.env.CONVERSATION_COLLECTION as string,
-  labelLocale: process.env.LABEL_LOCALE as string,
-  labelVerificationEmail: process.env.LABEL_VERIFICATION_EMAIL as string,
-  maxPostLength: Number(process.env.MAX_POST_LENGTH),
+  botBskyUsername: Env.getRequiredStringEnvVarOrThrow('BOT_BSKY_USERNAME'),
+  botBskyPassword: Env.getRequiredStringEnvVarOrThrow('BOT_BSKY_PASSWORD'),
+  labelerBskyUsername: Env.getRequiredStringEnvVarOrThrow('LABELER_BSKY_USERNAME'),
+  labelerBskyPassword: Env.getRequiredStringEnvVarOrThrow('LABELER_BSKY_PASSWORD'),
+  labelerDid: Env.getRequiredStringEnvVarOrThrow('LABELER_DID'),
+  maxLabels: Env.getRequiredNumberEnvVarOrThrow('MAX_LABELS'),
+  selfServeLabelIdentifiers: Env.getRequiredCommaSeparatedEnvVarOrThrow('SELF_SERVE_LABEL_IDENTIFIERS'),
+  verifiedLabels: Env.getOptionalCommaSeparatedEnvVar('VERIFIED_LABELS'),
+  port: Env.getRequiredNumberEnvVarOrThrow('PORT'),
+  conversationCollection: Env.getRequiredStringEnvVarOrThrow('CONVERSATION_COLLECTION'),
+  labelLocale: Env.getRequiredStringEnvVarOrThrow('LABEL_LOCALE'),
+  labelVerificationEmail: Env.getRequiredStringEnvVarOrThrow('LABEL_VERIFICATION_EMAIL'),
+  maxPostLength: Env.getRequiredNumberEnvVarOrThrow('MAX_POST_LENGTH'),
 });
 
 blueskyCommunityBot.run();
