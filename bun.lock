@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "BlueskyCommunityBot",
+      "name": "bsky-community-bot",
       "dependencies": {
         "@atproto/api": "^0.13.35",
         "@skyware/bot": "^0.3.8",

@@ -1,5 +1,5 @@
 {
-  "name": "BlueskyCommunityBot",
+  "name": "bsky-community-bot",
   "module": "main.ts",
   "type": "module",
   "scripts": {
