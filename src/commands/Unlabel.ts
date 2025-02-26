@@ -46,9 +46,7 @@ export class UnlabelCommand extends Command {
           i + 1
         }. ${UnlabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(
           selfServeLabel.val,
-          post.langs
-            ? post.langs
-            : [UnlabelCommand.blueskyCommunityBot.options.defaultLabelLocale]
+          post.langs ? post.langs : []
         )}\n`;
         labelListString = labelListString.concat(labelString);
         removeIndexes.push(`${i + 1}`);
@@ -182,9 +180,7 @@ export class UnlabelCommand extends Command {
         const appliedLabelNames =
           UnlabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelNames(
             labelsToRemove,
-            reply.langs
-              ? reply.langs
-              : [UnlabelCommand.blueskyCommunityBot.options.defaultLabelLocale]
+            reply.langs ? reply.langs : []
           );
         const removedLabelNameString = appliedLabelNames.join(", ");
         try {

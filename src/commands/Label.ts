@@ -62,9 +62,7 @@ export class LabelCommand extends Command {
     const example2 = "fietser";
     const example3 = "safe-streets";
 
-    const locales = post.langs
-      ? post.langs
-      : [LabelCommand.blueskyCommunityBot.options.defaultLabelLocale];
+    const locales = post.langs ? post.langs : [];
 
     const postText = `let's get you some bike labels!\n\nhere's a list of our labels. please reply with the numbers of the labels you would like separated by commas. for example, if you want ${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(
       example1,
@@ -183,12 +181,7 @@ export class LabelCommand extends Command {
                 await reply.reply({
                   text: `you already have one of these labels (${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(
                     selfServeLabelIdentifier,
-                    reply.langs
-                      ? reply.langs
-                      : [
-                          LabelCommand.blueskyCommunityBot.options
-                            .defaultLabelLocale,
-                        ]
+                    reply.langs ? reply.langs : []
                   )}). can you please try again?`,
                 });
                 return stillWaitingResponse;
@@ -260,9 +253,7 @@ export class LabelCommand extends Command {
         const appliedLabelNames =
           LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelNames(
             labelsToApply,
-            reply.langs
-              ? reply.langs
-              : [LabelCommand.blueskyCommunityBot.options.defaultLabelLocale]
+            reply.langs ? reply.langs : []
           );
         const appliedLabelNameString = appliedLabelNames.join(", ");
         try {

@@ -360,9 +360,7 @@ export class LabelPoliciesKeeper {
 
   async getLabelImageRoute(req: Request, res: Response) {
     const imageOptionsPayload = await this.getLabelOptionsImagePayload(
-      req.params["locale"]
-        ? [req.params["locale"] as string]
-        : [this.blueskyCommunityBot.options.defaultLabelLocale]
+      req.params["locale"] ? [req.params["locale"] as string] : []
     );
     res.type("png");
     res.end(imageOptionsPayload.labelOptionsCanvas.toBuffer("image/png"));
@@ -424,9 +422,17 @@ export class LabelPoliciesKeeper {
   }
 
   getLabelName(labelIdentifier: string, locales: string[]): string | undefined {
+    const desiredLocales = locales.concat([
+      this.blueskyCommunityBot.options.defaultLabelLocale,
+    ]);
+
     if (this.labelerPolicies.labelValueDefinitions) {
-      for (let localeIndex = 0; localeIndex < locales.length; localeIndex++) {
-        const desiredLocale = locales[localeIndex];
+      for (
+        let localeIndex = 0;
+        localeIndex < desiredLocales.length;
+        localeIndex++
+      ) {
+        const desiredLocale = desiredLocales[localeIndex];
 
         for (
           let i = 0;
