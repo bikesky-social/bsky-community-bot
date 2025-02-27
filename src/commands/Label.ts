@@ -3,6 +3,7 @@ import { Post } from "@skyware/bot";
 import type { CommandValidationResult, CommandState } from "./Command";
 import type { CommandMap } from "../CommandGenerator";
 import { BlueskyCommunityBot } from "../BlueskyCommunityBot";
+import type { TFunction } from "i18next";
 
 enum LabelCommandStates {
   Closed,
@@ -57,7 +58,10 @@ export class LabelCommand extends Command {
     }
   }
 
-  async mention(post: Post): Promise<CommandState> {
+  async mention(
+    post: Post,
+    t: TFunction<string, undefined>
+  ): Promise<CommandState> {
     const example1 = "bike-enjoyer";
     const example2 = "fietser";
     const example3 = "safe-streets";
@@ -109,7 +113,8 @@ export class LabelCommand extends Command {
 
   static async reply(
     commandState: CommandState,
-    reply: Post
+    reply: Post,
+    t:TFunction<string, undefined>
   ): Promise<CommandState> {
     const conversationClosedResponse = {
       command: LabelCommand.commandName,

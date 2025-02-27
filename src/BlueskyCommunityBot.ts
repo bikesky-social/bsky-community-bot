@@ -143,7 +143,8 @@ export class BlueskyCommunityBot {
         );
         const validCmd = await cmd.validateCommand();
         if (validCmd.valid) {
-          const commandResult = await cmd.mention(post);
+          const t = this.getFixedT(post.langs ? post.langs : [], cmd.getCommandName());
+          const commandResult = await cmd.mention(post,t);
           if (commandResult.state != CommandStates.Closed) {
             try {
               const stateSavingResponse = await this.chatBot.putRecord(
@@ -193,7 +194,8 @@ export class BlueskyCommunityBot {
               commandState.command
             );
             if (cmdClass) {
-              const commandResult = await cmdClass.reply(commandState, reply);
+              const t = this.getFixedT(reply.langs ? reply.langs : [], commandState.command);
+              const commandResult = await cmdClass.reply(commandState, reply, t);
 
               if (commandResult.state === CommandStates.Closed) {
                 try {

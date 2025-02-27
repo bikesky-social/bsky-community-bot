@@ -1,6 +1,7 @@
 import type { CommandMap } from "../CommandGenerator";
 import { Bot, Post } from "@skyware/bot";
 import { BlueskyCommunityBot } from "../BlueskyCommunityBot";
+import type { TFunction } from "i18next";
 
 export type CommandValidationResult = {
   valid: boolean;
@@ -46,7 +47,7 @@ export class Command {
     };
   }
 
-  async mention(post: Post): Promise<CommandState> {
+  async mention(post: Post, t:TFunction<string, undefined>): Promise<CommandState> {
     console.log("unhandled mention: " + post);
     return {
       command: Command.commandName,
@@ -57,7 +58,8 @@ export class Command {
 
   static async reply(
     commandState: CommandState,
-    reply: Post
+    reply: Post,
+    t:TFunction<string, undefined>
   ): Promise<CommandState> {
     console.log("unhandled reply: " + reply);
     return {
@@ -65,5 +67,9 @@ export class Command {
       authorDid: reply.author.did,
       state: CommandStates.Closed,
     };
+  }
+
+  getCommandName() {
+    return Command.commandName;
   }
 }

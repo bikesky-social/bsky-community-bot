@@ -1,6 +1,7 @@
 import { Command } from "./Command";
 import { Post, PostReference } from "@skyware/bot";
 import type { CommandValidationResult, CommandState } from "./Command";
+import type { TFunction } from "i18next";
 
 enum ListCommandsCommandStates {
   Closed,
@@ -17,11 +18,10 @@ export class ListCommandsCommand extends Command {
     };
   }
 
-  async mention(post: Post): Promise<CommandState> {
-    const t = ListCommandsCommand.blueskyCommunityBot.getFixedT(
-      post.langs ? post.langs : [],
-      ListCommandsCommand.commandName
-    );
+async mention(
+    post: Post,
+    t: TFunction<string, undefined>
+  ): Promise<CommandState> {
     const responsePosts = [];
 
     const commandKeys = Object.keys(

@@ -1,6 +1,7 @@
 import { Command } from "./Command";
 import { Post } from "@skyware/bot";
 import type { CommandValidationResult, CommandState } from "./Command";
+import type { TFunction } from "i18next";
 
 enum UnlabelCommandStates {
   Closed,
@@ -29,8 +30,11 @@ export class UnlabelCommand extends Command {
     }
   }
 
-  async mention(post: Post): Promise<CommandState> {
-    const selfServeLabels =
+async mention(
+    post: Post,
+    t: TFunction<string, undefined>
+  ): Promise<CommandState> {
+      const selfServeLabels =
       await UnlabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getTargetSelfServeLabels(
         post.author.did
       );
@@ -80,7 +84,8 @@ export class UnlabelCommand extends Command {
 
   static async reply(
     commandState: CommandState,
-    reply: Post
+    reply: Post,
+    t:TFunction<string, undefined>
   ): Promise<CommandState> {
     const conversationClosedResponse = {
       command: UnlabelCommand.commandName,
