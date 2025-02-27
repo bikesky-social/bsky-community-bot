@@ -18,18 +18,24 @@ export class ListCommandsCommand extends Command {
   }
 
   async mention(post: Post): Promise<CommandState> {
+    const t = ListCommandsCommand.blueskyCommunityBot.getFixedT(
+      post.langs ? post.langs : [],
+      ListCommandsCommand.commandName
+    );
     const responsePosts = [];
 
     const commandKeys = Object.keys(
       ListCommandsCommand.blueskyCommunityBot.commandGenerator.commandMap
     );
 
-    let currentPost = "this account will respond to the following commands:\n";
+    let currentPost = t("post.intro");
 
     for (let i = 0; i < commandKeys.length; i++) {
       const commandKey = commandKeys[i];
       const command =
-        ListCommandsCommand.blueskyCommunityBot.commandGenerator.commandMap[commandKey];
+        ListCommandsCommand.blueskyCommunityBot.commandGenerator.commandMap[
+          commandKey
+        ];
       const commandString = `@${ListCommandsCommand.blueskyCommunityBot.options.botBskyUsername} ${command.commandName}\n`;
 
       if (
@@ -39,7 +45,7 @@ export class ListCommandsCommand extends Command {
         currentPost = currentPost.concat(commandString);
       } else {
         responsePosts.push(currentPost);
-        currentPost = "Continued:\n";
+        currentPost = t("post.continued");
       }
     }
 
