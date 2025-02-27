@@ -12,6 +12,10 @@ export class UnlabelCommand extends Command {
   static commandName = "unlabel";
   static commandDescription = "remove labels from your account";
 
+  getCommandName() {
+    return UnlabelCommand.commandName;
+  }
+
   async validateCommand(
     t: TFunction<string, undefined>
   ): Promise<CommandValidationResult> {
@@ -57,11 +61,17 @@ export class UnlabelCommand extends Command {
         labelListString = labelListString.concat(labelString);
         removeIndexes.push(`${i + 1}`);
       }
+
+      const postText =
+        t("post.intro") +
+        "\n\n" +
+        labelListString +
+        "\n" +
+        t("post.replyInstructions", { numberList: removeIndexes.join(",") });
+
       await post.reply(
         {
-          text: `here is a list of the labels on your account:\n\n${labelListString}\nplease reply with the numbers of the labels you would like separated by commas. for example, if you want to remove all of them, reply with "${removeIndexes.join(
-            ","
-          )}"`,
+          text: postText,
         },
         { splitLongPost: true }
       );
@@ -124,34 +134,34 @@ export class UnlabelCommand extends Command {
           if (isNaN(labelIndex)) {
             // invalid response - not a number
             await reply.reply({
-              text: "not all of these choices are valid numbers. can you please try again?",
+              text: t("error.invalidNumber"),
             });
             return stillWaitingResponse;
           } else if (Number.isInteger(labelIndex) === false) {
             // invalid response - not an integer
             await reply.reply({
-              text: "not all of these choices are valid numbers. can you please try again?",
+              text: t("error.invalidNumber"),
             });
             return stillWaitingResponse;
           } else if (Number.isSafeInteger(labelIndex) === false) {
             // invalid response - not a safe integer
             await reply.reply({
-              text: "not all of these choices are valid numbers. can you please try again?",
+              text: t("error.invalidNumber"),
             });
             return stillWaitingResponse;
           } else if (labelIndex < 1 || labelIndex > maxChoice) {
             // invalid response - outside of range
             await reply.reply({
-              text: "not all of these choices are valid. can you please try again?",
+              text: t("error.invalidChoices"),
             });
             return stillWaitingResponse;
           }
         }
 
         if (indexList.length != uniqueIndeces.length) {
-          // invalid response - not all unique choices
+          // invalid response - duplicate choices
           await reply.reply({
-            text: "not all of these choices are unique. can you please try again?",
+            text: t("error.duplicateChoices"),
           });
           return stillWaitingResponse;
         }
@@ -194,7 +204,9 @@ export class UnlabelCommand extends Command {
           // reply that we applied the following labels: xxx
           await reply.reply(
             {
-              text: `okay i have removed these labels from your account: ${removedLabelNameString}\n\nif you ever want to add more labels, you can do so by sending me a post that says 'label'`,
+              text: t("post.success", {
+                labelNames: removedLabelNameString,
+              }),
             },
             { splitLongPost: true }
           );

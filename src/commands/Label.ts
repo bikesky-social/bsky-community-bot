@@ -15,6 +15,10 @@ export class LabelCommand extends Command {
   static commandDescription = "add labels to your account";
   static maxLabels = -1;
 
+  getCommandName() {
+    return LabelCommand.commandName;
+  }
+
   static async registerCommand(
     cmap: CommandMap,
     blueskyCommunityBot: BlueskyCommunityBot

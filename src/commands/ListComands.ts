@@ -11,6 +11,10 @@ export class ListCommandsCommand extends Command {
   static commandName = "listcommands";
   static commandDescription = "list the available commands";
 
+  getCommandName() {
+    return ListCommandsCommand.commandName;
+  }
+
   async validateCommand(
     t: TFunction<string, undefined>
   ): Promise<CommandValidationResult> {
@@ -30,7 +34,7 @@ export class ListCommandsCommand extends Command {
       ListCommandsCommand.blueskyCommunityBot.commandGenerator.commandMap
     );
 
-    let currentPost = t("post.intro");
+    let currentPost = t("post.intro") + "\n\n";
 
     for (let i = 0; i < commandKeys.length; i++) {
       const commandKey = commandKeys[i];
@@ -47,7 +51,7 @@ export class ListCommandsCommand extends Command {
         currentPost = currentPost.concat(commandString);
       } else {
         responsePosts.push(currentPost);
-        currentPost = t("post.continued");
+        currentPost = t("post.continued") + "\n\n";
       }
     }
 
