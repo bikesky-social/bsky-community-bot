@@ -202,11 +202,16 @@ export class UnlabelCommand extends Command {
         const removedLabelNameString = appliedLabelNames.join(", ");
         try {
           // reply that we applied the following labels: xxx
+          const postText =
+            t("post.successLine1", {
+              labelNames: removedLabelNameString,
+            }) +
+            "\n\n" +
+            t("post.successLine2");
+
           await reply.reply(
             {
-              text: t("post.success", {
-                labelNames: removedLabelNameString,
-              }),
+              text: postText,
             },
             { splitLongPost: true }
           );

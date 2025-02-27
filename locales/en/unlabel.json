@@ -2,7 +2,8 @@
   "post": {
     "intro": "Here is a list of the labels on your account:",
     "replyInstructions": "Please reply with the numbers of the labels you would like separated by commas. For example, if you want to remove all of them, reply with \"{{numberList}}\"",
-    "success": "Okay, I have removed these labels from your account: {{labelNames}}\n\nIf you ever want to add more labels, you can do so by sending me a post that says 'label'"
+    "successLine1": "Okay, I have removed these labels from your account: {{labelNames}}",
+    "successLine2": "If you ever want to add more labels, you can do so by sending me a post that says 'label'"
   },
   "error": {
     "commandNotAvailable": "This command is not available at the moment. Please try again later.",
