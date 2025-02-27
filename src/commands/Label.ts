@@ -47,7 +47,7 @@ export class LabelCommand extends Command {
       if (selfServeLabels.length >= LabelCommand.maxLabels) {
         return {
           valid: false,
-          response: `this account already has the maximum number of labels that we allow (${LabelCommand.maxLabels}). if you would like to switch to some new labels, you can remove labels from an account by using the unlabel command.`,
+          response: t("error.maxLabels", { maxLabels: LabelCommand.maxLabels }),
         };
       } else {
         this.validCommand = true;
@@ -59,7 +59,7 @@ export class LabelCommand extends Command {
     } else {
       return {
         valid: false,
-        response: `this command is not available at the moment. please try again later.`,
+        response: t("error.commandNotAvailable"),
       };
     }
   }
@@ -68,34 +68,72 @@ export class LabelCommand extends Command {
     post: Post,
     t: TFunction<string, undefined>
   ): Promise<CommandState> {
-    const example1 = "bike-enjoyer";
-    const example2 = "fietser";
-    const example3 = "safe-streets";
+    // calculate the length of the post without examples populated
+    let emptyPost =
+      t("post.intro") +
+      "\n\n" +
+      t("post.instructions", { labelExamples: "", numberList: "" });
 
+    if (LabelCommand.blueskyCommunityBot.options.verifiedLabels.length > 0) {
+      emptyPost += "\n\n" + t("post.verification");
+    }
+
+    const maxExampleLength =
+      LabelCommand.blueskyCommunityBot.options.maxPostLength - emptyPost.length;
+
+    // generate random label examples
+    const rndSelfServeIdentifiers =
+      LabelCommand.blueskyCommunityBot.options.selfServeLabelIdentifiers.map(
+        (x) => x
+      );
+
+    rndSelfServeIdentifiers.sort(() => Math.random() - 0.5);
+
+    const examples = [];
+    const exampleIndexes = [];
     const locales = post.langs ? post.langs : [];
 
-    const postText = `let's get you some bike labels!\n\nhere's a list of our labels. please reply with the numbers of the labels you would like separated by commas. for example, if you want ${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(
-      example1,
-      locales
-    )}, ${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(
-      example2,
-      locales
-    )} and ${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(
-      example3,
-      locales
-    )}, reply with "${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.get1BasedLabelIndex(
-      example1
-    )}, ${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.get1BasedLabelIndex(
-      example2
-    )}, ${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.get1BasedLabelIndex(
-      example3
-    )}"\n\n*labels with asterisks will require a manual verification step`;
+    while (
+      examples.length < LabelCommand.blueskyCommunityBot.options.maxLabels &&
+      examples.join(", ").length + exampleIndexes.join(", ").length <
+        maxExampleLength &&
+      rndSelfServeIdentifiers.length > 0
+    ) {
+      const exampleIdent = rndSelfServeIdentifiers.shift() as string;
 
+      examples.push(
+        LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(
+          exampleIdent,
+          locales
+        )
+      );
+      exampleIndexes.push(
+        LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.get1BasedLabelIndex(
+          exampleIdent
+        )
+      );
+    }
+
+    // construct the post text
+    let postText =
+      t("post.intro") +
+      "\n\n" +
+      t("post.instructions", {
+        labelExamples: examples.join(", "),
+        numberList: exampleIndexes.join(", "),
+      });
+
+    if (LabelCommand.blueskyCommunityBot.options.verifiedLabels.length > 0) {
+      postText += "\n\n" + t("post.verification");
+    }
+
+    // fetch the image payload
     const imagePayload =
       await LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelOptionsImagePayload(
         locales
       );
 
+    // post
     await post.reply({
       text: postText,
       images: [

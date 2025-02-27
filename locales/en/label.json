@@ -1,0 +1,11 @@
+{
+  "post": {
+    "intro": "Let's get you some labels!",
+    "instructions":"Here's a list of our labels. Please reply with the numbers of the labels you would like separated by commas. For example, if you want ({{labelExamples}}), reply with \"{{numberList}}\"",
+    "verification":"*Labels with asterisks will require manual verification"
+  },
+  "error": {
+    "maxLabels": "Your account already has the maximum number of labels that we allow ({{maxLabels}}). If you would like to switch to some new labels, you can remove labels from an account by using the 'unlabel' command.",
+    "commandNotAvailable": "This command is not available at the moment. please try again later."
+  }
+}
