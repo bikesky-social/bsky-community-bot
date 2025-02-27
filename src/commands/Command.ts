@@ -35,19 +35,27 @@ export class Command {
     this.validCommand = false;
   }
 
-  static async registerCommand(cmap: CommandMap, blueskyCommunityBot: BlueskyCommunityBot) {
+  static async registerCommand(
+    cmap: CommandMap,
+    blueskyCommunityBot: BlueskyCommunityBot
+  ) {
     cmap[this.commandName] = this;
     this.blueskyCommunityBot = blueskyCommunityBot;
   }
 
-  async validateCommand(): Promise<CommandValidationResult> {
+  async validateCommand(
+    t: TFunction<string, undefined>
+  ): Promise<CommandValidationResult> {
     return {
       valid: false,
       response: `this is not a valid command. try asking for help using the /help command`,
     };
   }
 
-  async mention(post: Post, t:TFunction<string, undefined>): Promise<CommandState> {
+  async mention(
+    post: Post,
+    t: TFunction<string, undefined>
+  ): Promise<CommandState> {
     console.log("unhandled mention: " + post);
     return {
       command: Command.commandName,
@@ -59,7 +67,7 @@ export class Command {
   static async reply(
     commandState: CommandState,
     reply: Post,
-    t:TFunction<string, undefined>
+    t: TFunction<string, undefined>
   ): Promise<CommandState> {
     console.log("unhandled reply: " + reply);
     return {

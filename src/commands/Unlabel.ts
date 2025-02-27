@@ -12,7 +12,9 @@ export class UnlabelCommand extends Command {
   static commandName = "unlabel";
   static commandDescription = "remove labels from your account";
 
-  async validateCommand(): Promise<CommandValidationResult> {
+  async validateCommand(
+    t: TFunction<string, undefined>
+  ): Promise<CommandValidationResult> {
     if (
       UnlabelCommand.blueskyCommunityBot.labelPoliciesKeeper
         .hasValidSelfServeLabels
@@ -25,16 +27,16 @@ export class UnlabelCommand extends Command {
     } else {
       return {
         valid: false,
-        response: `this command is not available at the moment. please try again later.`,
+        response: t("error.commandNotAvailable"),
       };
     }
   }
 
-async mention(
+  async mention(
     post: Post,
     t: TFunction<string, undefined>
   ): Promise<CommandState> {
-      const selfServeLabels =
+    const selfServeLabels =
       await UnlabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getTargetSelfServeLabels(
         post.author.did
       );
@@ -71,7 +73,7 @@ async mention(
       };
     } else {
       await post.reply({
-        text: `your account does not have any of our labels on it. if you would like to add some you can do this by sending the 'label' command to this account`,
+        text: t("error.noLabelsFound"),
       });
 
       return {
@@ -85,7 +87,7 @@ async mention(
   static async reply(
     commandState: CommandState,
     reply: Post,
-    t:TFunction<string, undefined>
+    t: TFunction<string, undefined>
   ): Promise<CommandState> {
     const conversationClosedResponse = {
       command: UnlabelCommand.commandName,

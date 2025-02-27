@@ -141,9 +141,9 @@ export class BlueskyCommunityBot {
           commandAndParts.commandParts,
           post
         );
-        const validCmd = await cmd.validateCommand();
+        const t = this.getFixedT(post.langs ? post.langs : [], cmd.getCommandName());
+        const validCmd = await cmd.validateCommand(t);
         if (validCmd.valid) {
-          const t = this.getFixedT(post.langs ? post.langs : [], cmd.getCommandName());
           const commandResult = await cmd.mention(post,t);
           if (commandResult.state != CommandStates.Closed) {
             try {

@@ -1,0 +1,9 @@
+{
+  "post": {
+    "inner": "value"
+  },
+  "error": {
+    "commandNotAvailable": "This command is not available at the moment. Please try again later.",
+    "noLabelsFound": "Your account does not have any of our labels on it. If you would like to add some, you can do this by sending the 'label' command to this account."
+  }
+}

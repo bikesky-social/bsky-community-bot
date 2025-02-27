@@ -11,14 +11,16 @@ export class ListCommandsCommand extends Command {
   static commandName = "listcommands";
   static commandDescription = "list the available commands";
 
-  async validateCommand(): Promise<CommandValidationResult> {
+  async validateCommand(
+    t: TFunction<string, undefined>
+  ): Promise<CommandValidationResult> {
     return {
       valid: true,
       response: "",
     };
   }
 
-async mention(
+  async mention(
     post: Post,
     t: TFunction<string, undefined>
   ): Promise<CommandState> {

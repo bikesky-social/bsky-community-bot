@@ -27,7 +27,9 @@ export class LabelCommand extends Command {
         : LabelCommand.blueskyCommunityBot.options.maxLabels;
   }
 
-  async validateCommand(): Promise<CommandValidationResult> {
+  async validateCommand(
+    t: TFunction<string, undefined>
+  ): Promise<CommandValidationResult> {
     if (
       LabelCommand.blueskyCommunityBot.labelPoliciesKeeper
         .hasValidSelfServeLabels
@@ -114,7 +116,7 @@ export class LabelCommand extends Command {
   static async reply(
     commandState: CommandState,
     reply: Post,
-    t:TFunction<string, undefined>
+    t: TFunction<string, undefined>
   ): Promise<CommandState> {
     const conversationClosedResponse = {
       command: LabelCommand.commandName,
