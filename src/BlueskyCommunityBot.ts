@@ -5,6 +5,9 @@ import express from "express";
 import type { CommandState } from "./commands/Command";
 import { CommandStates } from "./commands/Command";
 import { LabelPoliciesKeeper } from "./LabelPoliciesKeeper";
+import i18n from "i18next";
+import Backend from "i18next-fs-backend";
+const fs = require("fs");
 
 type BlueskyCommunityBotOptions = {
   botBskyUsername: string;
@@ -18,7 +21,7 @@ type BlueskyCommunityBotOptions = {
   port: number;
   conversationCollection: string;
   labelVerificationEmail: string;
-  defaultLabelLocale: string;
+  defaultLocale: string;
   maxPostLength: number;
 };
 
@@ -29,6 +32,7 @@ export class BlueskyCommunityBot {
   readonly labelerBot: Bot;
   readonly commandGenerator: CommandGenerator;
   readonly labelPoliciesKeeper: LabelPoliciesKeeper;
+  readonly i18n: typeof i18n;
 
   constructor(options: BlueskyCommunityBotOptions) {
     this.options = options;
@@ -43,6 +47,7 @@ export class BlueskyCommunityBot {
         ? this.chatBot
         : new Bot();
     this.labelPoliciesKeeper = new LabelPoliciesKeeper(this);
+    this.i18n = i18n.createInstance().use(Backend);
   }
 
   getCommandClassAndPartsByPost(
@@ -67,7 +72,26 @@ export class BlueskyCommunityBot {
     return undefined;
   }
 
+  log(key: string) {
+    console.log(this.i18n.t(key, key, { lng: this.options.defaultLocale }));
+  }
+
   async run() {
+    // initialize i18n
+    this.i18n.init({
+      fallbackLng: "en",
+      debug: true,
+      initAsync: false,
+      saveMissing: true,
+      preload: fs.readdirSync("./locales"),
+      backend: {
+        loadPath: "./locales/{{lng}}/{{ns}}.json",
+        addPath: "./locales/{{lng}}/{{ns}}.json",
+      },
+    });
+
+    this.log("initialized i18n");
+
     //  initialize chat bots
 
     await this.chatBot.login({
@@ -75,7 +99,7 @@ export class BlueskyCommunityBot {
       password: this.options.botBskyPassword,
     });
 
-    console.log("chat bot logged in");
+    this.log("chat bot logged in");
 
     if (this.options.botBskyUsername != this.options.labelerBskyUsername) {
       await this.labelerBot.login({
@@ -83,7 +107,7 @@ export class BlueskyCommunityBot {
         password: this.options.labelerBskyPassword,
       });
 
-      console.log("labeler bot logged in");
+      this.log("labeler bot logged in");
     }
 
     await this.commandGenerator.registerCommands();
@@ -92,22 +116,22 @@ export class BlueskyCommunityBot {
     // chat bot handlers
 
     this.chatBot.on("open", async () => {
-      console.log("open: the chat bot has begun listening for events");
+      this.log("open: the chat bot has begun listening for events");
     });
 
     this.chatBot.on("close", async () => {
-      console.log("closed: the chat bot has stopped listening for events");
+      this.log("closed: the chat bot has stopped listening for events");
     });
 
     this.chatBot.on("error", async (error) => {
-      console.log(`chat bot error occurred: ${error}`);
+      this.log(`chat bot error occurred: ${error}`);
     });
 
     this.chatBot.on("mention", async (post) => {
       const commandAndParts = this.getCommandClassAndPartsByPost(post);
 
       if (commandAndParts) {
-        console.log(
+        this.log(
           `${post.cid} command received from ${post.author.did}: ${post.text}`
         );
 
@@ -125,17 +149,19 @@ export class BlueskyCommunityBot {
                 commandResult,
                 post.cid
               );
-              console.log(
-                `saved conversation state: ${JSON.stringify(stateSavingResponse)}`
+              this.log(
+                `saved conversation state: ${JSON.stringify(
+                  stateSavingResponse
+                )}`
               );
             } catch (error) {
-              console.log(
+              this.log(
                 `failed to save conversation state: ${JSON.stringify(error)}`
               );
             }
           }
         } else {
-          console.log(
+          this.log(
             `${post.cid} command validation response: ${validCmd.response}`
           );
           await post.reply({ text: validCmd.response });
@@ -157,7 +183,7 @@ export class BlueskyCommunityBot {
             }
           );
 
-          console.log(`fetched commandState: ${JSON.stringify(record)}`);
+          this.log(`fetched commandState: ${JSON.stringify(record)}`);
           const commandState = record.data.value as CommandState;
 
           if (commandState.authorDid === reply.author.did) {
@@ -171,10 +197,12 @@ export class BlueskyCommunityBot {
                 try {
                   const recordAtUri = `at://${this.chatBot.profile.did}/${this.options.conversationCollection}/${reply.replyRef?.root.cid}`;
                   const result = await this.chatBot.deleteRecord(recordAtUri);
-                  console.log(`conversation closed: ${recordAtUri}`);
+                  this.log(`conversation closed: ${recordAtUri}`);
                 } catch (error) {
-                  console.log(
-                    `failed to delete conversation state: ${JSON.stringify(error)}`
+                  this.log(
+                    `failed to delete conversation state: ${JSON.stringify(
+                      error
+                    )}`
                   );
                 }
               } else {
@@ -184,22 +212,26 @@ export class BlueskyCommunityBot {
                     commandResult,
                     reply.replyRef?.root.cid
                   );
-                  console.log(
-                    `saved conversation state: ${JSON.stringify(stateSavingResponse)}`
+                  this.log(
+                    `saved conversation state: ${JSON.stringify(
+                      stateSavingResponse
+                    )}`
                   );
                 } catch (error) {
-                  console.log(
-                    `failed to save conversation state: ${JSON.stringify(error)}`
+                  this.log(
+                    `failed to save conversation state: ${JSON.stringify(
+                      error
+                    )}`
                   );
                 }
               }
             }
           }
         } catch (error) {
-          console.log(`failed to fetch commandState: ${JSON.stringify(error)}`);
+          this.log(`failed to fetch commandState: ${JSON.stringify(error)}`);
         }
       } else {
-        console.log("reply has no root: " + JSON.stringify(reply));
+        this.log("reply has no root: " + JSON.stringify(reply));
       }
     });
 
@@ -210,7 +242,7 @@ export class BlueskyCommunityBot {
     });
 
     this.server.listen(this.options.port, () => {
-      console.log(`server listening on port ${this.options.port}`);
+      this.log(`server listening on port ${this.options.port}`);
     });
   }
 }
