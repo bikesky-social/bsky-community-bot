@@ -362,7 +362,7 @@ export class LabelPoliciesKeeper {
     const imageOptionsPayload = await this.getLabelOptionsImagePayload(
       req.params["locale"]
         ? [req.params["locale"] as string]
-        : [this.blueskyCommunityBot.options.defaultLabelLocale]
+        : [this.blueskyCommunityBot.options.defaultLocale]
     );
     res.type("png");
     res.end(imageOptionsPayload.labelOptionsCanvas.toBuffer("image/png"));

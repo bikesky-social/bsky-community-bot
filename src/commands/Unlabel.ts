@@ -48,7 +48,7 @@ export class UnlabelCommand extends Command {
           selfServeLabel.val,
           post.langs
             ? post.langs
-            : [UnlabelCommand.blueskyCommunityBot.options.defaultLabelLocale]
+            : [UnlabelCommand.blueskyCommunityBot.options.defaultLocale]
         )}\n`;
         labelListString = labelListString.concat(labelString);
         removeIndexes.push(`${i + 1}`);
@@ -184,7 +184,7 @@ export class UnlabelCommand extends Command {
             labelsToRemove,
             reply.langs
               ? reply.langs
-              : [UnlabelCommand.blueskyCommunityBot.options.defaultLabelLocale]
+              : [UnlabelCommand.blueskyCommunityBot.options.defaultLocale]
           );
         const removedLabelNameString = appliedLabelNames.join(", ");
         try {

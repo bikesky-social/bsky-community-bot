@@ -64,7 +64,7 @@ export class LabelCommand extends Command {
 
     const locales = post.langs
       ? post.langs
-      : [LabelCommand.blueskyCommunityBot.options.defaultLabelLocale];
+      : [LabelCommand.blueskyCommunityBot.options.defaultLocale];
 
     const postText = `let's get you some bike labels!\n\nhere's a list of our labels. please reply with the numbers of the labels you would like separated by commas. for example, if you want ${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(
       example1,
@@ -187,7 +187,7 @@ export class LabelCommand extends Command {
                       ? reply.langs
                       : [
                           LabelCommand.blueskyCommunityBot.options
-                            .defaultLabelLocale,
+                            .defaultLocale,
                         ]
                   )}). can you please try again?`,
                 });
@@ -262,7 +262,7 @@ export class LabelCommand extends Command {
             labelsToApply,
             reply.langs
               ? reply.langs
-              : [LabelCommand.blueskyCommunityBot.options.defaultLabelLocale]
+              : [LabelCommand.blueskyCommunityBot.options.defaultLocale]
           );
         const appliedLabelNameString = appliedLabelNames.join(", ");
         try {
