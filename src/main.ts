@@ -6,7 +6,6 @@ const blueskyCommunityBot = new BlueskyCommunityBot({
   botBskyPassword: Env.getRequiredStringEnvVarOrThrow('BOT_BSKY_PASSWORD'),
   labelerBskyUsername: Env.getRequiredStringEnvVarOrThrow('LABELER_BSKY_USERNAME'),
   labelerBskyPassword: Env.getRequiredStringEnvVarOrThrow('LABELER_BSKY_PASSWORD'),
-  labelerDid: Env.getRequiredStringEnvVarOrThrow('LABELER_DID'),
   maxLabels: Env.getRequiredNumberEnvVarOrThrow('MAX_LABELS'),
   selfServeLabelIdentifiers: Env.getRequiredCommaSeparatedEnvVarOrThrow('SELF_SERVE_LABEL_IDENTIFIERS'),
   verifiedLabels: Env.getOptionalCommaSeparatedEnvVar('VERIFIED_LABELS'),

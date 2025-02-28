@@ -116,7 +116,7 @@ export class LabelPoliciesKeeper {
 
     try {
       const labelDefs = await agent.app.bsky.labeler.getServices({
-        dids: [this.blueskyCommunityBot.options.labelerDid],
+        dids: [this.blueskyCommunityBot.labelerBot.profile.did],
         detailed: true,
       });
       this.labelerPolicies = labelDefs.data.views[0]

@@ -14,7 +14,6 @@ type BlueskyCommunityBotOptions = {
   botBskyPassword: string;
   labelerBskyUsername: string;
   labelerBskyPassword: string;
-  labelerDid: string;
   maxLabels: number;
   selfServeLabelIdentifiers: string[];
   verifiedLabels: string[];
