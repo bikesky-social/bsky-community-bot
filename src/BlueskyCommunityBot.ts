@@ -141,33 +141,26 @@ export class BlueskyCommunityBot {
           commandAndParts.commandParts,
           post
         );
-        const t = this.getFixedT(post.langs ? post.langs : [], cmd.getCommandName());
-        const validCmd = await cmd.validateCommand(t);
-        if (validCmd.valid) {
-          const commandResult = await cmd.mention(post,t);
-          if (commandResult.state != CommandStates.Closed) {
-            try {
-              const stateSavingResponse = await this.chatBot.putRecord(
-                this.options.conversationCollection,
-                commandResult,
-                post.cid
-              );
-              console.log(
-                `saved conversation state: ${JSON.stringify(
-                  stateSavingResponse
-                )}`
-              );
-            } catch (error) {
-              console.log(
-                `failed to save conversation state: ${JSON.stringify(error)}`
-              );
-            }
+        const t = this.getFixedT(
+          post.langs ? post.langs : [],
+          cmd.getCommandName()
+        );
+        const commandResult = await cmd.mention(post, t);
+        if (commandResult.state != CommandStates.Closed) {
+          try {
+            const stateSavingResponse = await this.chatBot.putRecord(
+              this.options.conversationCollection,
+              commandResult,
+              post.cid
+            );
+            console.log(
+              `saved conversation state: ${JSON.stringify(stateSavingResponse)}`
+            );
+          } catch (error) {
+            console.log(
+              `failed to save conversation state: ${JSON.stringify(error)}`
+            );
           }
-        } else {
-          console.log(
-            `${post.cid} command validation response: ${validCmd.response}`
-          );
-          await post.reply({ text: validCmd.response });
         }
       }
     });
@@ -194,8 +187,15 @@ export class BlueskyCommunityBot {
               commandState.command
             );
             if (cmdClass) {
-              const t = this.getFixedT(reply.langs ? reply.langs : [], commandState.command);
-              const commandResult = await cmdClass.reply(commandState, reply, t);
+              const t = this.getFixedT(
+                reply.langs ? reply.langs : [],
+                commandState.command
+              );
+              const commandResult = await cmdClass.reply(
+                commandState,
+                reply,
+                t
+              );
 
               if (commandResult.state === CommandStates.Closed) {
                 try {

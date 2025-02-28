@@ -1,6 +1,6 @@
 import { Command } from "./Command";
 import { Post, PostReference } from "@skyware/bot";
-import type { CommandValidationResult, CommandState } from "./Command";
+import type { CommandState } from "./Command";
 import type { TFunction } from "i18next";
 
 enum ListCommandsCommandStates {
@@ -13,15 +13,6 @@ export class ListCommandsCommand extends Command {
 
   getCommandName() {
     return ListCommandsCommand.commandName;
-  }
-
-  async validateCommand(
-    t: TFunction<string, undefined>
-  ): Promise<CommandValidationResult> {
-    return {
-      valid: true,
-      response: "",
-    };
   }
 
   async mention(

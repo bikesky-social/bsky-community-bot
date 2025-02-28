@@ -1,6 +1,6 @@
 import { Command } from "./Command";
 import { Post } from "@skyware/bot";
-import type { CommandValidationResult, CommandState } from "./Command";
+import type { CommandState } from "./Command";
 import type { CommandMap } from "../CommandGenerator";
 import { BlueskyCommunityBot } from "../BlueskyCommunityBot";
 import type { TFunction } from "i18next";
@@ -31,43 +31,38 @@ export class LabelCommand extends Command {
         : LabelCommand.blueskyCommunityBot.options.maxLabels;
   }
 
-  async validateCommand(
-    t: TFunction<string, undefined>
-  ): Promise<CommandValidationResult> {
-    if (
-      LabelCommand.blueskyCommunityBot.labelPoliciesKeeper
-        .hasValidSelfServeLabels
-    ) {
-      const selfServeLabels =
-        await LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getTargetSelfServeLabels(
-          this.rootPost.author.did
-        );
-
-      // check if max labels would be exceeded
-      if (selfServeLabels.length >= LabelCommand.maxLabels) {
-        return {
-          valid: false,
-          response: t("error.maxLabels", { maxLabels: LabelCommand.maxLabels }),
-        };
-      } else {
-        this.validCommand = true;
-        return {
-          valid: true,
-          response: "",
-        };
-      }
-    } else {
-      return {
-        valid: false,
-        response: t("error.commandNotAvailable"),
-      };
-    }
-  }
-
   async mention(
     post: Post,
     t: TFunction<string, undefined>
   ): Promise<CommandState> {
+    const conversationClosedResponse = {
+      command: LabelCommand.commandName,
+      authorDid: post.author.did,
+      state: LabelCommandStates.Closed,
+    };
+
+    // check if command is available
+    if (
+      LabelCommand.blueskyCommunityBot.labelPoliciesKeeper
+        .hasValidSelfServeLabels === false
+    ) {
+      await post.reply({ text: t("error.commandNotAvailable") });
+      return conversationClosedResponse;
+    }
+
+    const selfServeLabels =
+      await LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getTargetSelfServeLabels(
+        this.rootPost.author.did
+      );
+
+    // check if max labels would be exceeded
+    if (selfServeLabels.length >= LabelCommand.maxLabels) {
+      await post.reply({
+        text: t("error.maxLabels", { maxLabels: LabelCommand.maxLabels }),
+      });
+      return conversationClosedResponse;
+    }
+
     // calculate the length of the post without examples populated
     let emptyPost =
       t("post.intro") +

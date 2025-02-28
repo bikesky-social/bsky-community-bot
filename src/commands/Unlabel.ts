@@ -1,6 +1,6 @@
 import { Command } from "./Command";
 import { Post } from "@skyware/bot";
-import type { CommandValidationResult, CommandState } from "./Command";
+import type { CommandState } from "./Command";
 import type { TFunction } from "i18next";
 
 enum UnlabelCommandStates {
@@ -16,30 +16,25 @@ export class UnlabelCommand extends Command {
     return UnlabelCommand.commandName;
   }
 
-  async validateCommand(
-    t: TFunction<string, undefined>
-  ): Promise<CommandValidationResult> {
-    if (
-      UnlabelCommand.blueskyCommunityBot.labelPoliciesKeeper
-        .hasValidSelfServeLabels
-    ) {
-      this.validCommand = true;
-      return {
-        valid: true,
-        response: "",
-      };
-    } else {
-      return {
-        valid: false,
-        response: t("error.commandNotAvailable"),
-      };
-    }
-  }
-
   async mention(
     post: Post,
     t: TFunction<string, undefined>
   ): Promise<CommandState> {
+    const conversationClosedResponse = {
+      command: UnlabelCommand.commandName,
+      authorDid: post.author.did,
+      state: UnlabelCommandStates.Closed,
+    };
+
+    // check if command is available
+    if (
+      UnlabelCommand.blueskyCommunityBot.labelPoliciesKeeper
+        .hasValidSelfServeLabels === false
+    ) {
+      await post.reply({ text: t("error.commandNotAvailable") });
+      return conversationClosedResponse;
+    }
+
     const selfServeLabels =
       await UnlabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getTargetSelfServeLabels(
         post.author.did
@@ -86,11 +81,7 @@ export class UnlabelCommand extends Command {
         text: t("error.noLabelsFound"),
       });
 
-      return {
-        command: UnlabelCommand.commandName,
-        authorDid: post.author.did,
-        state: UnlabelCommandStates.Closed,
-      };
+      return conversationClosedResponse;
     }
   }
 

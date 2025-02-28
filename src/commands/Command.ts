@@ -3,11 +3,6 @@ import { Bot, Post } from "@skyware/bot";
 import { BlueskyCommunityBot } from "../BlueskyCommunityBot";
 import type { TFunction } from "i18next";
 
-export type CommandValidationResult = {
-  valid: boolean;
-  response: string;
-};
-
 export enum CommandStates {
   Closed,
 }
@@ -25,14 +20,12 @@ export class Command {
   command: string[];
   params: string[];
   rootPost: Post;
-  validCommand: boolean;
 
   constructor(command: string[], post: Post) {
     this.command = command;
     command.shift();
     this.params = command;
     this.rootPost = post;
-    this.validCommand = false;
   }
 
   static async registerCommand(
@@ -41,15 +34,6 @@ export class Command {
   ) {
     cmap[this.commandName] = this;
     this.blueskyCommunityBot = blueskyCommunityBot;
-  }
-
-  async validateCommand(
-    t: TFunction<string, undefined>
-  ): Promise<CommandValidationResult> {
-    return {
-      valid: false,
-      response: `this is not a valid command. try asking for help using the /help command`,
-    };
   }
 
   async mention(
