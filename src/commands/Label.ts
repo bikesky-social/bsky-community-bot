@@ -197,25 +197,25 @@ export class LabelCommand extends Command {
           if (isNaN(labelIndex)) {
             // invalid response - not a number
             await reply.reply({
-              text: "not all of these choices are valid numbers. can you please try again?",
+              text: t("error.invalidNumber"),
             });
             return stillWaitingResponse;
           } else if (Number.isInteger(labelIndex) === false) {
             // invalid response - not an integer
             await reply.reply({
-              text: "not all of these choices are valid numbers. can you please try again?",
+              text: t("error.invalidNumber"),
             });
             return stillWaitingResponse;
           } else if (Number.isSafeInteger(labelIndex) === false) {
             // invalid response - not a safe integer
             await reply.reply({
-              text: "not all of these choices are valid numbers. can you please try again?",
+              text: t("error.invalidNumber"),
             });
             return stillWaitingResponse;
           } else if (labelIndex < 1 || labelIndex > maxChoice) {
             // invalid response - outside of range
             await reply.reply({
-              text: "not all of these choices are valid. can you please try again?",
+              text: t("error.invalidChoice"),
             });
             return stillWaitingResponse;
           } else {
@@ -228,10 +228,13 @@ export class LabelCommand extends Command {
               ) {
                 // invalid response - they already have this label
                 await reply.reply({
-                  text: `you already have one of these labels (${LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(
-                    selfServeLabelIdentifier,
-                    reply.langs ? reply.langs : []
-                  )}). can you please try again?`,
+                  text: t("error.duplicateLabel", {
+                    labelName:
+                      LabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(
+                        selfServeLabelIdentifier,
+                        reply.langs ? reply.langs : []
+                      ),
+                  }),
                 });
                 return stillWaitingResponse;
               }
@@ -245,7 +248,9 @@ export class LabelCommand extends Command {
         ) {
           // invalid response - this would result in too many labels
           await reply.reply({
-            text: `adding this many labels would exceed the maximum that we allow on accounts (${LabelCommand.maxLabels}). can you please try again?`,
+            text: t("error.addingTooManyLabels", {
+              maxLabels: LabelCommand.maxLabels,
+            }),
           });
           return stillWaitingResponse;
         }
@@ -253,7 +258,7 @@ export class LabelCommand extends Command {
         if (indexList.length != uniqueIndeces.length) {
           // invalid response - not all unique choices
           await reply.reply({
-            text: "not all of these choices are unique. can you please try again?",
+            text: t("error.duplicateChoices"),
           });
           return stillWaitingResponse;
         }
