@@ -2,16 +2,11 @@ import type { CommandMap } from "../CommandGenerator";
 import { Bot, Post } from "@skyware/bot";
 import { BlueskyCommunityBot } from "../BlueskyCommunityBot";
 import type { TFunction } from "i18next";
+import * as CommandState from "../lexicon/types/app/bikesky/communityBot/commandState";
 
 export enum CommandStates {
   Closed,
 }
-
-export type CommandState = {
-  command: string;
-  authorDid: string;
-  state: number;
-};
 
 export class Command {
   static blueskyCommunityBot: BlueskyCommunityBot;
@@ -39,9 +34,11 @@ export class Command {
   async mention(
     post: Post,
     t: TFunction<string, undefined>
-  ): Promise<CommandState> {
+  ): Promise<CommandState.Record> {
     console.log("unhandled mention: " + post);
+
     return {
+      $type: "app.bikesky.communityBot.commandState",
       command: Command.commandName,
       authorDid: post.author.did,
       state: CommandStates.Closed,
@@ -49,12 +46,14 @@ export class Command {
   }
 
   static async reply(
-    commandState: CommandState,
+    commandState: CommandState.Record,
     reply: Post,
     t: TFunction<string, undefined>
-  ): Promise<CommandState> {
+  ): Promise<CommandState.Record> {
     console.log("unhandled reply: " + reply);
+
     return {
+      $type: "app.bikesky.communityBot.commandState",
       command: Command.commandName,
       authorDid: reply.author.did,
       state: CommandStates.Closed,

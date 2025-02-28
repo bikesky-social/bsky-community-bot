@@ -1,6 +1,6 @@
 import { Command } from "./Command";
 import { Post, PostReference } from "@skyware/bot";
-import type { CommandState } from "./Command";
+import * as CommandState from "../lexicon/types/app/bikesky/communityBot/commandState";
 import type { TFunction } from "i18next";
 
 enum ListCommandsCommandStates {
@@ -18,7 +18,7 @@ export class ListCommandsCommand extends Command {
   async mention(
     post: Post,
     t: TFunction<string, undefined>
-  ): Promise<CommandState> {
+  ): Promise<CommandState.Record> {
     const responsePosts = [];
 
     const commandKeys = Object.keys(
@@ -56,6 +56,7 @@ export class ListCommandsCommand extends Command {
     }
 
     return {
+      $type: "app.bikesky.communityBot.commandState",
       command: ListCommandsCommand.commandName,
       authorDid: post.author.did,
       state: ListCommandsCommandStates.Closed,

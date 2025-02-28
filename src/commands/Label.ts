@@ -1,6 +1,6 @@
 import { Command } from "./Command";
 import { Post } from "@skyware/bot";
-import type { CommandState } from "./Command";
+import * as CommandState from "../lexicon/types/app/bikesky/communityBot/commandState";
 import type { CommandMap } from "../CommandGenerator";
 import { BlueskyCommunityBot } from "../BlueskyCommunityBot";
 import type { TFunction } from "i18next";
@@ -34,9 +34,10 @@ export class LabelCommand extends Command {
   async mention(
     post: Post,
     t: TFunction<string, undefined>
-  ): Promise<CommandState> {
-    const conversationClosedResponse = {
-      command: LabelCommand.commandName,
+  ): Promise<CommandState.Record> {
+    const conversationClosedResponse: CommandState.Record = {
+      $type: "app.bikesky.communityBot.commandState",
+      command: Command.commandName,
       authorDid: post.author.did,
       state: LabelCommandStates.Closed,
     };
@@ -144,6 +145,7 @@ export class LabelCommand extends Command {
     });
 
     return {
+      $type: "app.bikesky.communityBot.commandState",
       command: LabelCommand.commandName,
       authorDid: post.author.did,
       state: LabelCommandStates.WaitingForLabelChoices,
@@ -151,18 +153,20 @@ export class LabelCommand extends Command {
   }
 
   static async reply(
-    commandState: CommandState,
+    commandState: CommandState.Record,
     reply: Post,
     t: TFunction<string, undefined>
-  ): Promise<CommandState> {
-    const conversationClosedResponse = {
+  ): Promise<CommandState.Record> {
+    const conversationClosedResponse: CommandState.Record = {
+      $type: "app.bikesky.communityBot.commandState",
       command: LabelCommand.commandName,
       authorDid: reply.author.did,
       state: LabelCommandStates.Closed,
     };
 
     if (commandState.state === LabelCommandStates.WaitingForLabelChoices) {
-      const stillWaitingResponse = {
+      const stillWaitingResponse: CommandState.Record = {
+        $type: "app.bikesky.communityBot.commandState",
         command: LabelCommand.commandName,
         authorDid: reply.author.did,
         state: LabelCommandStates.WaitingForLabelChoices,

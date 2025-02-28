@@ -1,0 +1,28 @@
+{
+  "lexicon": 1,
+  "id": "app.bikesky.communityBot.commandState",
+  "description": "describes a command in progress and its state",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": ["command", "authorDid", "state"],
+        "properties": {
+          "command": {
+            "type": "string",
+            "minLength": 1
+          },
+          "authorDid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "state": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

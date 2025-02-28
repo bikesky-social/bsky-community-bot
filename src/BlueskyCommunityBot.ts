@@ -2,12 +2,13 @@ import { Bot, EventStrategy, Post } from "@skyware/bot";
 import { CommandGenerator } from "./CommandGenerator";
 import { Command } from "./commands/Command";
 import express from "express";
-import type { CommandState } from "./commands/Command";
+import * as CommandState from "./lexicon/types/app/bikesky/communityBot/commandState";
 import { CommandStates } from "./commands/Command";
 import { LabelPoliciesKeeper } from "./LabelPoliciesKeeper";
 import i18n from "i18next";
 import Backend from "i18next-fs-backend";
 const fs = require("fs");
+import { ids } from "./lexicon/lexicons";
 
 type BlueskyCommunityBotOptions = {
   botBskyUsername: string;
@@ -18,7 +19,6 @@ type BlueskyCommunityBotOptions = {
   selfServeLabelIdentifiers: string[];
   verifiedLabels: string[];
   port: number;
-  conversationCollection: string;
   labelVerificationEmail: string;
   defaultLocale: string;
   maxPostLength: number;
@@ -148,7 +148,7 @@ export class BlueskyCommunityBot {
         if (commandResult.state != CommandStates.Closed) {
           try {
             const stateSavingResponse = await this.chatBot.putRecord(
-              this.options.conversationCollection,
+              ids.AppBikeskyCommunityBotCommandState,
               commandResult,
               post.cid
             );
@@ -172,60 +172,68 @@ export class BlueskyCommunityBot {
             {
               params: {
                 repo: this.chatBot.profile.did,
-                collection: this.options.conversationCollection,
+                collection: ids.AppBikeskyCommunityBotCommandState,
                 rkey: reply.replyRef?.root.cid,
               },
             }
           );
 
           console.log(`fetched commandState: ${JSON.stringify(record)}`);
-          const commandState = record.data.value as CommandState;
 
-          if (commandState.authorDid === reply.author.did) {
-            const cmdClass = this.commandGenerator.getCommandClassByName(
-              commandState.command
-            );
-            if (cmdClass) {
-              const t = this.getFixedT(
-                reply.langs ? reply.langs : [],
+          const recordValue = record.data.value;
+
+          if (
+            CommandState.isRecord(recordValue) &&
+            CommandState.validateRecord(recordValue).success
+          ) {
+            const commandState = recordValue as CommandState.Record;
+
+            if (commandState.authorDid === reply.author.did) {
+              const cmdClass = this.commandGenerator.getCommandClassByName(
                 commandState.command
               );
-              const commandResult = await cmdClass.reply(
-                commandState,
-                reply,
-                t
-              );
+              if (cmdClass) {
+                const t = this.getFixedT(
+                  reply.langs ? reply.langs : [],
+                  commandState.command
+                );
+                const commandResult = await cmdClass.reply(
+                  commandState,
+                  reply,
+                  t
+                );
 
-              if (commandResult.state === CommandStates.Closed) {
-                try {
-                  const recordAtUri = `at://${this.chatBot.profile.did}/${this.options.conversationCollection}/${reply.replyRef?.root.cid}`;
-                  const result = await this.chatBot.deleteRecord(recordAtUri);
-                  console.log(`conversation closed: ${recordAtUri}`);
-                } catch (error) {
-                  console.log(
-                    `failed to delete conversation state: ${JSON.stringify(
-                      error
-                    )}`
-                  );
-                }
-              } else {
-                try {
-                  const stateSavingResponse = await this.chatBot.putRecord(
-                    this.options.conversationCollection,
-                    commandResult,
-                    reply.replyRef?.root.cid
-                  );
-                  console.log(
-                    `saved conversation state: ${JSON.stringify(
-                      stateSavingResponse
-                    )}`
-                  );
-                } catch (error) {
-                  console.log(
-                    `failed to save conversation state: ${JSON.stringify(
-                      error
-                    )}`
-                  );
+                if (commandResult.state === CommandStates.Closed) {
+                  try {
+                    const recordAtUri = `at://${this.chatBot.profile.did}/${ids.AppBikeskyCommunityBotCommandState}/${reply.replyRef?.root.cid}`;
+                    await this.chatBot.deleteRecord(recordAtUri);
+                    console.log(`conversation closed: ${recordAtUri}`);
+                  } catch (error) {
+                    console.log(
+                      `failed to delete conversation state: ${JSON.stringify(
+                        error
+                      )}`
+                    );
+                  }
+                } else {
+                  try {
+                    const stateSavingResponse = await this.chatBot.putRecord(
+                      ids.AppBikeskyCommunityBotCommandState,
+                      commandResult,
+                      reply.replyRef?.root.cid
+                    );
+                    console.log(
+                      `saved conversation state: ${JSON.stringify(
+                        stateSavingResponse
+                      )}`
+                    );
+                  } catch (error) {
+                    console.log(
+                      `failed to save conversation state: ${JSON.stringify(
+                        error
+                      )}`
+                    );
+                  }
                 }
               }
             }

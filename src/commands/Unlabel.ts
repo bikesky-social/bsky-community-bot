@@ -1,6 +1,6 @@
 import { Command } from "./Command";
 import { Post } from "@skyware/bot";
-import type { CommandState } from "./Command";
+import * as CommandState from "../lexicon/types/app/bikesky/communityBot/commandState";
 import type { TFunction } from "i18next";
 
 enum UnlabelCommandStates {
@@ -19,8 +19,9 @@ export class UnlabelCommand extends Command {
   async mention(
     post: Post,
     t: TFunction<string, undefined>
-  ): Promise<CommandState> {
-    const conversationClosedResponse = {
+  ): Promise<CommandState.Record> {
+    const conversationClosedResponse: CommandState.Record = {
+      $type: "app.bikesky.communityBot.commandState",
       command: UnlabelCommand.commandName,
       authorDid: post.author.did,
       state: UnlabelCommandStates.Closed,
@@ -72,6 +73,7 @@ export class UnlabelCommand extends Command {
       );
 
       return {
+        $type: "app.bikesky.communityBot.commandState",
         command: UnlabelCommand.commandName,
         authorDid: post.author.did,
         state: UnlabelCommandStates.WaitingForUnlabelChoices,
@@ -86,18 +88,20 @@ export class UnlabelCommand extends Command {
   }
 
   static async reply(
-    commandState: CommandState,
+    commandState: CommandState.Record,
     reply: Post,
     t: TFunction<string, undefined>
-  ): Promise<CommandState> {
-    const conversationClosedResponse = {
+  ): Promise<CommandState.Record> {
+    const conversationClosedResponse: CommandState.Record = {
+      $type: "app.bikesky.communityBot.commandState",
       command: UnlabelCommand.commandName,
       authorDid: reply.author.did,
       state: UnlabelCommandStates.Closed,
     };
 
     if (commandState.state === UnlabelCommandStates.WaitingForUnlabelChoices) {
-      const stillWaitingResponse = {
+      const stillWaitingResponse: CommandState.Record = {
+        $type: "app.bikesky.communityBot.commandState",
         command: UnlabelCommand.commandName,
         authorDid: reply.author.did,
         state: UnlabelCommandStates.WaitingForUnlabelChoices,

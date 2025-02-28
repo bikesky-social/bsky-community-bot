@@ -10,7 +10,6 @@ const blueskyCommunityBot = new BlueskyCommunityBot({
   selfServeLabelIdentifiers: Env.getRequiredCommaSeparatedEnvVarOrThrow('SELF_SERVE_LABEL_IDENTIFIERS'),
   verifiedLabels: Env.getOptionalCommaSeparatedEnvVar('VERIFIED_LABELS'),
   port: Env.getRequiredNumberEnvVarOrThrow('PORT'),
-  conversationCollection: Env.getRequiredStringEnvVarOrThrow('CONVERSATION_COLLECTION'),
   defaultLocale: Env.getRequiredStringEnvVarOrThrow('DEFAULT_LOCALE'),
   labelVerificationEmail: Env.getRequiredStringEnvVarOrThrow('LABEL_VERIFICATION_EMAIL'),
   maxPostLength: Env.getRequiredNumberEnvVarOrThrow('MAX_POST_LENGTH'),
