@@ -8,7 +8,7 @@ import { LabelPoliciesKeeper } from "./LabelPoliciesKeeper";
 import i18n from "i18next";
 import Backend from "i18next-fs-backend";
 const fs = require("fs");
-import { ids } from "./lexicon/lexicons";
+import * as BskyCommunityBotLexicons from "./lexicon/lexicons";
 
 type BlueskyCommunityBotOptions = {
   botBskyUsername: string;
@@ -148,7 +148,7 @@ export class BlueskyCommunityBot {
         if (commandResult.state != CommandStates.Closed) {
           try {
             const stateSavingResponse = await this.chatBot.putRecord(
-              ids.AppBikeskyCommunityBotCommandState,
+              BskyCommunityBotLexicons.ids.AppBikeskyCommunityBotCommandState,
               commandResult,
               post.cid
             );
@@ -172,7 +172,7 @@ export class BlueskyCommunityBot {
             {
               params: {
                 repo: this.chatBot.profile.did,
-                collection: ids.AppBikeskyCommunityBotCommandState,
+                collection: BskyCommunityBotLexicons.ids.AppBikeskyCommunityBotCommandState,
                 rkey: reply.replyRef?.root.cid,
               },
             }
@@ -205,7 +205,7 @@ export class BlueskyCommunityBot {
 
                 if (commandResult.state === CommandStates.Closed) {
                   try {
-                    const recordAtUri = `at://${this.chatBot.profile.did}/${ids.AppBikeskyCommunityBotCommandState}/${reply.replyRef?.root.cid}`;
+                    const recordAtUri = `at://${this.chatBot.profile.did}/${BskyCommunityBotLexicons.ids.AppBikeskyCommunityBotCommandState}/${reply.replyRef?.root.cid}`;
                     await this.chatBot.deleteRecord(recordAtUri);
                     console.log(`conversation closed: ${recordAtUri}`);
                   } catch (error) {
@@ -218,7 +218,8 @@ export class BlueskyCommunityBot {
                 } else {
                   try {
                     const stateSavingResponse = await this.chatBot.putRecord(
-                      ids.AppBikeskyCommunityBotCommandState,
+                      BskyCommunityBotLexicons.ids
+                        .AppBikeskyCommunityBotCommandState,
                       commandResult,
                       reply.replyRef?.root.cid
                     );
