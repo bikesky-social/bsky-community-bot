@@ -18,7 +18,7 @@ export class ListCommandsCommand extends Command {
     const responsePosts = [];
 
     const commandKeys = Object.keys(
-      this.blueskyCommunityBot.commandGenerator.commandMap
+      this.blueskyCommunityBot.commandMap
     );
 
     let currentPost = t("post.intro") + "\n\n";
@@ -26,7 +26,7 @@ export class ListCommandsCommand extends Command {
     for (let i = 0; i < commandKeys.length; i++) {
       const commandKey = commandKeys[i];
       const command =
-        this.blueskyCommunityBot.commandGenerator.commandMap[commandKey];
+        this.blueskyCommunityBot.commandMap[commandKey];
       const commandString = `@${this.blueskyCommunityBot.options.botBskyUsername} ${command.commandName}\n`;
 
       if (

@@ -1,5 +1,4 @@
 import { Bot, EventStrategy, Post } from "@skyware/bot";
-import { CommandGenerator } from "./CommandGenerator";
 import { Command } from "./commands/Command";
 import express from "express";
 import * as CommandState from "./lexicon/types/app/bikesky/communityBot/commandState";
@@ -24,18 +23,21 @@ type BlueskyCommunityBotOptions = {
   maxPostLength: number;
 };
 
+type CommandMap = {
+  [commandName: string]: Command;
+};
+
 export class BlueskyCommunityBot {
   readonly options: BlueskyCommunityBotOptions;
+  readonly commandMap: CommandMap = {};
   readonly server = express();
   readonly chatBot: Bot;
   readonly labelerBot: Bot;
-  readonly commandGenerator: CommandGenerator;
   readonly labelPoliciesKeeper: LabelPoliciesKeeper;
   readonly i18n: typeof i18n;
 
   constructor(options: BlueskyCommunityBotOptions) {
     this.options = options;
-    this.commandGenerator = new CommandGenerator(this);
     this.chatBot = new Bot({
       eventEmitterOptions: {
         strategy: EventStrategy.Firehose,
@@ -57,13 +59,17 @@ export class BlueskyCommunityBot {
       const handleAndCommand = lowerPostText.split(atUsernameSpace);
       const command = handleAndCommand[1];
 
-      const cmd = this.commandGenerator.getCommandByName(command);
+      const cmd = this.commandMap[command];
 
       if (cmd) {
         return cmd;
       }
     }
     return undefined;
+  }
+
+  addCommand(command:Command) {
+    this.commandMap[command.commandName] = command;
   }
 
   getFixedT(lngs: string[], namespace: string) {
@@ -106,7 +112,6 @@ export class BlueskyCommunityBot {
       console.log("labeler bot logged in");
     }
 
-    this.commandGenerator.registerCommands();
     await this.labelPoliciesKeeper.init();
 
     // chat bot handlers
@@ -179,9 +184,7 @@ export class BlueskyCommunityBot {
             const commandState = recordValue as CommandState.Record;
 
             if (commandState.authorDid === reply.author.did) {
-              const cmd = this.commandGenerator.getCommandByName(
-                commandState.command
-              );
+              const cmd = this.commandMap[commandState.command];
               if (cmd) {
                 const t = this.getFixedT(
                   reply.langs ? reply.langs : [],
