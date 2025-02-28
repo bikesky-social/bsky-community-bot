@@ -49,23 +49,18 @@ export class BlueskyCommunityBot {
     this.i18n = i18n.createInstance().use(Backend);
   }
 
-  getCommandClassAndPartsByPost(
-    post: Post
-  ): { command: Command; commandParts: string[] } | undefined {
+  getCommandByPost(post: Post): Command | undefined {
     const lowerPostText = post.text.toLowerCase();
+    const atUsernameSpace = "@" + this.options.botBskyUsername + " ";
 
-    if (lowerPostText.startsWith("@" + this.options.botBskyUsername + " ")) {
-      const handleAndCommandParts = lowerPostText.split(" ");
-      const commandParts = handleAndCommandParts[1].split(" ");
-      const command = commandParts[0];
+    if (lowerPostText.startsWith(atUsernameSpace)) {
+      const handleAndCommand = lowerPostText.split(atUsernameSpace);
+      const command = handleAndCommand[1];
 
       const cmd = this.commandGenerator.getCommandByName(command);
 
       if (cmd) {
-        return {
-          command: cmd,
-          commandParts: commandParts,
-        };
+        return cmd;
       }
     }
     return undefined;
@@ -129,14 +124,13 @@ export class BlueskyCommunityBot {
     });
 
     this.chatBot.on("mention", async (post) => {
-      const commandAndParts = this.getCommandClassAndPartsByPost(post);
+      const cmd = this.getCommandByPost(post);
 
-      if (commandAndParts) {
+      if (cmd) {
         console.log(
           `${post.cid} command received from ${post.author.did}: ${post.text}`
         );
 
-        const cmd = commandAndParts.command;
         const t = this.getFixedT(post.langs ? post.langs : [], cmd.commandName);
         const commandResult = await cmd.mention(post, t);
         if (commandResult.state != CommandStates.Closed) {
