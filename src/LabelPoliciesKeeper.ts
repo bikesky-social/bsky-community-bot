@@ -423,7 +423,7 @@ export class LabelPoliciesKeeper {
 
   getLabelName(labelIdentifier: string, locales: string[]): string | undefined {
     const desiredLocales = locales.concat([
-      this.blueskyCommunityBot.options.defaultLabelLocale,
+      this.blueskyCommunityBot.options.defaultLocale,
     ]);
 
     if (this.labelerPolicies.labelValueDefinitions) {
