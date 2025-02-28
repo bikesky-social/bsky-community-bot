@@ -69,7 +69,12 @@ export class BlueskyCommunityBot {
   }
 
   addCommand(command:Command) {
+    console.log(`added command: ${command.commandName}`);
     this.commandMap[command.commandName] = command;
+  }
+
+  addCommands(commands:Command[]) {
+    commands.map((cmd) => this.addCommand(cmd));
   }
 
   getFixedT(lngs: string[], namespace: string) {
@@ -77,7 +82,7 @@ export class BlueskyCommunityBot {
     return this.i18n.getFixedT(lngsWithFallback, namespace);
   }
 
-  async run() {
+  async go() {
     // initialize i18n
     this.i18n.init({
       fallbackLng: this.options.defaultLocale,

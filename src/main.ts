@@ -18,8 +18,10 @@ const bot = new BlueskyCommunityBot({
   maxPostLength: Env.getRequiredNumberEnvVarOrThrow("MAX_POST_LENGTH"),
 });
 
-bot.addCommand(new ListCommandsCommand(bot));
-bot.addCommand(new LabelCommand(bot));
-bot.addCommand(new UnlabelCommand(bot));
+bot.addCommands([
+  new ListCommandsCommand(bot),
+  new LabelCommand(bot),
+  new UnlabelCommand(bot),
+]);
 
-bot.run();
+bot.go();
