@@ -315,19 +315,35 @@ export class LabelCommand extends Command {
             // apply the labels we can and advise on manual verification for the rest
             const postRef = await reply.reply(
               {
-                text: `okay i applied these labels to your account: ${appliedLabelNameString}\n\nif you ever want to remove these, you can do so by sending me a post that says 'unlabel'\n\n1 or more of the labels you asked for needs manual verification ...`,
+                text:
+                  t("post.success", {
+                    appliedLabelNames: appliedLabelNameString,
+                  }) +
+                  "\n\n" +
+                  t("post.unlabelInstruction") +
+                  "\n\n" +
+                  t("post.verifiedLabelRequested"),
               },
               { splitLongPost: true }
             );
 
             await postRef.reply({
-              text: `to continue the verification process, can you send an email to ${LabelCommand.blueskyCommunityBot.options.labelVerificationEmail} that includes:\n\n1. your Bluesky handle\n2. the verified label you would like\n\nit helps if the email comes from a domain that relates to the label, but if that isn't possible, we can still figure it out`,
+              text: t("post.verificationInstruction", {
+                verificationEmail:
+                  LabelCommand.blueskyCommunityBot.options
+                    .labelVerificationEmail,
+              }),
             });
           } else {
             // reply that we applied the following labels: xxx
             await reply.reply(
               {
-                text: `okay i have applied these labels to your account: ${appliedLabelNameString}\n\nif you ever want to remove these, you can do so by sending me a post that says unlabel`,
+                text:
+                  t("post.success", {
+                    appliedLabelNames: appliedLabelNameString,
+                  }) +
+                  "\n\n" +
+                  t("post.unlabelInstruction"),
               },
               { splitLongPost: true }
             );
@@ -342,11 +358,14 @@ export class LabelCommand extends Command {
         try {
           // advise on manual verification
           const postRef = await reply.reply({
-            text: `one or more of the labels you asked for needs to be verified manually ...`,
+            text: t("post.verifiedLabelRequested"),
           });
 
           await postRef.reply({
-            text: `to continue the verification process, can you send an email to ${LabelCommand.blueskyCommunityBot.options.labelVerificationEmail} that includes:\n\n1. your Bluesky handle\n2. the verified label you would like\n\nit helps if the email comes from a domain that relates to the label, but if that isn't possible, we can still figure it out`,
+            text: t("post.verificationInstruction", {
+              verificationEmail:
+                LabelCommand.blueskyCommunityBot.options.labelVerificationEmail,
+            }),
           });
         } catch (error) {
           console.log(
