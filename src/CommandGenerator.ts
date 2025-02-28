@@ -5,24 +5,29 @@ import { UnlabelCommand } from "./commands/Unlabel";
 import { BlueskyCommunityBot } from "./BlueskyCommunityBot";
 
 export type CommandMap = {
-    [commandName:string]:typeof Command
+  [commandName: string]: Command;
 };
 
 export class CommandGenerator {
-    readonly commandMap: CommandMap = {};
-    readonly blueskyCommunityBot: BlueskyCommunityBot;
+  readonly commandMap: CommandMap = {};
+  readonly blueskyCommunityBot: BlueskyCommunityBot;
 
-    constructor(blueskyCommunityBot: BlueskyCommunityBot) {
-        this.blueskyCommunityBot = blueskyCommunityBot;
-    }
+  constructor(blueskyCommunityBot: BlueskyCommunityBot) {
+    this.blueskyCommunityBot = blueskyCommunityBot;
+  }
 
-    async registerCommands() {
-        await ListCommandsCommand.registerCommand(this.commandMap,this.blueskyCommunityBot);
-        await LabelCommand.registerCommand(this.commandMap,this.blueskyCommunityBot);
-        await UnlabelCommand.registerCommand(this.commandMap,this.blueskyCommunityBot);
-    }
+  registerCommands() {
+    const labelCommand = new LabelCommand(this.blueskyCommunityBot);
+    this.commandMap[labelCommand.commandName] = labelCommand;
 
-    getCommandClassByName(name:string) {
-        return this.commandMap[name];
-    }
+    const unlabelCommand = new UnlabelCommand(this.blueskyCommunityBot);
+    this.commandMap[unlabelCommand.commandName] = unlabelCommand;
+
+    const listCommandsCommand = new ListCommandsCommand(this.blueskyCommunityBot);
+    this.commandMap[listCommandsCommand.commandName] = listCommandsCommand;
+  }
+
+  getCommandByName(name: string) {
+    return this.commandMap[name];
+  }
 }

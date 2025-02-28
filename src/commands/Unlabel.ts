@@ -9,12 +9,8 @@ enum UnlabelCommandStates {
 }
 
 export class UnlabelCommand extends Command {
-  static commandName = "unlabel";
-  static commandDescription = "remove labels from your account";
-
-  getCommandName() {
-    return UnlabelCommand.commandName;
-  }
+  commandName = "unlabel";
+  commandDescription = "remove labels from your account";
 
   async mention(
     post: Post,
@@ -22,22 +18,22 @@ export class UnlabelCommand extends Command {
   ): Promise<CommandState.Record> {
     const conversationClosedResponse: CommandState.Record = {
       $type: "app.bikesky.communityBot.commandState",
-      command: UnlabelCommand.commandName,
+      command: this.commandName,
       authorDid: post.author.did,
       state: UnlabelCommandStates.Closed,
     };
 
     // check if command is available
     if (
-      UnlabelCommand.blueskyCommunityBot.labelPoliciesKeeper
-        .hasValidSelfServeLabels === false
+      this.blueskyCommunityBot.labelPoliciesKeeper.hasValidSelfServeLabels ===
+      false
     ) {
       await post.reply({ text: t("error.commandNotAvailable") });
       return conversationClosedResponse;
     }
 
     const selfServeLabels =
-      await UnlabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getTargetSelfServeLabels(
+      await this.blueskyCommunityBot.labelPoliciesKeeper.getTargetSelfServeLabels(
         post.author.did
       );
 
@@ -50,7 +46,7 @@ export class UnlabelCommand extends Command {
         const selfServeLabel = selfServeLabels[i];
         const labelString = `${
           i + 1
-        }. ${UnlabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(
+        }. ${this.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(
           selfServeLabel.val,
           post.langs ? post.langs : []
         )}\n`;
@@ -74,7 +70,7 @@ export class UnlabelCommand extends Command {
 
       return {
         $type: "app.bikesky.communityBot.commandState",
-        command: UnlabelCommand.commandName,
+        command: this.commandName,
         authorDid: post.author.did,
         state: UnlabelCommandStates.WaitingForUnlabelChoices,
       };
@@ -87,14 +83,14 @@ export class UnlabelCommand extends Command {
     }
   }
 
-  static async reply(
+  async reply(
     commandState: CommandState.Record,
     reply: Post,
     t: TFunction<string, undefined>
   ): Promise<CommandState.Record> {
     const conversationClosedResponse: CommandState.Record = {
       $type: "app.bikesky.communityBot.commandState",
-      command: UnlabelCommand.commandName,
+      command: this.commandName,
       authorDid: reply.author.did,
       state: UnlabelCommandStates.Closed,
     };
@@ -102,13 +98,13 @@ export class UnlabelCommand extends Command {
     if (commandState.state === UnlabelCommandStates.WaitingForUnlabelChoices) {
       const stillWaitingResponse: CommandState.Record = {
         $type: "app.bikesky.communityBot.commandState",
-        command: UnlabelCommand.commandName,
+        command: this.commandName,
         authorDid: reply.author.did,
         state: UnlabelCommandStates.WaitingForUnlabelChoices,
       };
 
       const selfServeLabels =
-        await UnlabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getTargetSelfServeLabels(
+        await this.blueskyCommunityBot.labelPoliciesKeeper.getTargetSelfServeLabels(
           reply.author.did
         );
 
@@ -181,7 +177,7 @@ export class UnlabelCommand extends Command {
       if (labelsToRemove.length > 0) {
         try {
           // remove the labels
-          await UnlabelCommand.blueskyCommunityBot.labelerBot.negateLabels({
+          await this.blueskyCommunityBot.labelerBot.negateLabels({
             reference: reply.author,
             labels: labelsToRemove,
           });
@@ -190,7 +186,7 @@ export class UnlabelCommand extends Command {
         }
 
         const appliedLabelNames =
-          UnlabelCommand.blueskyCommunityBot.labelPoliciesKeeper.getLabelNames(
+          this.blueskyCommunityBot.labelPoliciesKeeper.getLabelNames(
             labelsToRemove,
             reply.langs ? reply.langs : []
           );

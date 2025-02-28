@@ -8,12 +8,8 @@ enum ListCommandsCommandStates {
 }
 
 export class ListCommandsCommand extends Command {
-  static commandName = "listcommands";
-  static commandDescription = "list the available commands";
-
-  getCommandName() {
-    return ListCommandsCommand.commandName;
-  }
+  commandName = "listcommands";
+  commandDescription = "list the available commands";
 
   async mention(
     post: Post,
@@ -22,7 +18,7 @@ export class ListCommandsCommand extends Command {
     const responsePosts = [];
 
     const commandKeys = Object.keys(
-      ListCommandsCommand.blueskyCommunityBot.commandGenerator.commandMap
+      this.blueskyCommunityBot.commandGenerator.commandMap
     );
 
     let currentPost = t("post.intro") + "\n\n";
@@ -30,14 +26,12 @@ export class ListCommandsCommand extends Command {
     for (let i = 0; i < commandKeys.length; i++) {
       const commandKey = commandKeys[i];
       const command =
-        ListCommandsCommand.blueskyCommunityBot.commandGenerator.commandMap[
-          commandKey
-        ];
-      const commandString = `@${ListCommandsCommand.blueskyCommunityBot.options.botBskyUsername} ${command.commandName}\n`;
+        this.blueskyCommunityBot.commandGenerator.commandMap[commandKey];
+      const commandString = `@${this.blueskyCommunityBot.options.botBskyUsername} ${command.commandName}\n`;
 
       if (
         currentPost.length + commandString.length <=
-        ListCommandsCommand.blueskyCommunityBot.options.maxPostLength
+        this.blueskyCommunityBot.options.maxPostLength
       ) {
         currentPost = currentPost.concat(commandString);
       } else {
@@ -57,7 +51,7 @@ export class ListCommandsCommand extends Command {
 
     return {
       $type: "app.bikesky.communityBot.commandState",
-      command: ListCommandsCommand.commandName,
+      command: this.commandName,
       authorDid: post.author.did,
       state: ListCommandsCommandStates.Closed,
     };

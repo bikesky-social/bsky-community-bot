@@ -51,7 +51,7 @@ export class BlueskyCommunityBot {
 
   getCommandClassAndPartsByPost(
     post: Post
-  ): { command: typeof Command; commandParts: string[] } | undefined {
+  ): { command: Command; commandParts: string[] } | undefined {
     const lowerPostText = post.text.toLowerCase();
 
     if (lowerPostText.startsWith("@" + this.options.botBskyUsername + " ")) {
@@ -59,11 +59,11 @@ export class BlueskyCommunityBot {
       const commandParts = handleAndCommandParts[1].split(" ");
       const command = commandParts[0];
 
-      const cmdClass = this.commandGenerator.getCommandClassByName(command);
+      const cmd = this.commandGenerator.getCommandByName(command);
 
-      if (cmdClass) {
+      if (cmd) {
         return {
-          command: this.commandGenerator.getCommandClassByName(command),
+          command: cmd,
           commandParts: commandParts,
         };
       }
@@ -111,7 +111,7 @@ export class BlueskyCommunityBot {
       console.log("labeler bot logged in");
     }
 
-    await this.commandGenerator.registerCommands();
+    this.commandGenerator.registerCommands();
     await this.labelPoliciesKeeper.init();
 
     // chat bot handlers
@@ -136,14 +136,8 @@ export class BlueskyCommunityBot {
           `${post.cid} command received from ${post.author.did}: ${post.text}`
         );
 
-        const cmd = new commandAndParts.command(
-          commandAndParts.commandParts,
-          post
-        );
-        const t = this.getFixedT(
-          post.langs ? post.langs : [],
-          cmd.getCommandName()
-        );
+        const cmd = commandAndParts.command;
+        const t = this.getFixedT(post.langs ? post.langs : [], cmd.commandName);
         const commandResult = await cmd.mention(post, t);
         if (commandResult.state != CommandStates.Closed) {
           try {
@@ -172,7 +166,9 @@ export class BlueskyCommunityBot {
             {
               params: {
                 repo: this.chatBot.profile.did,
-                collection: BskyCommunityBotLexicons.ids.AppBikeskyCommunityBotCommandState,
+                collection:
+                  BskyCommunityBotLexicons.ids
+                    .AppBikeskyCommunityBotCommandState,
                 rkey: reply.replyRef?.root.cid,
               },
             }
@@ -189,19 +185,15 @@ export class BlueskyCommunityBot {
             const commandState = recordValue as CommandState.Record;
 
             if (commandState.authorDid === reply.author.did) {
-              const cmdClass = this.commandGenerator.getCommandClassByName(
+              const cmd = this.commandGenerator.getCommandByName(
                 commandState.command
               );
-              if (cmdClass) {
+              if (cmd) {
                 const t = this.getFixedT(
                   reply.langs ? reply.langs : [],
                   commandState.command
                 );
-                const commandResult = await cmdClass.reply(
-                  commandState,
-                  reply,
-                  t
-                );
+                const commandResult = await cmd.reply(commandState, reply, t);
 
                 if (commandResult.state === CommandStates.Closed) {
                   try {
