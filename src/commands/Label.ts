@@ -1,7 +1,6 @@
 import { Command } from "./Command";
 import { Post } from "@skyware/bot";
 import * as CommandState from "../lexicon/types/app/bikesky/communityBot/commandState";
-import type { CommandMap } from "../CommandGenerator";
 import { BlueskyCommunityBot } from "../BlueskyCommunityBot";
 import type { TFunction } from "i18next";
 
