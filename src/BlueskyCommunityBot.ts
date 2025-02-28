@@ -138,7 +138,7 @@ export class BlueskyCommunityBot {
 
       if (cmd) {
         console.log(
-          `${post.cid} command received from ${post.author.did}: ${post.text}`
+          `[mention] command received from ${post.author.did}: ${post.text} (${post.uri})`
         );
 
         const t = this.getFixedT(post.langs ? post.langs : [], cmd.commandName);
@@ -149,9 +149,6 @@ export class BlueskyCommunityBot {
               BskyCommunityBotLexicons.ids.AppBikeskyCommunityBotCommandState,
               commandResult,
               post.cid
-            );
-            console.log(
-              `saved conversation state: ${JSON.stringify(stateSavingResponse)}`
             );
           } catch (error) {
             console.log(
@@ -178,8 +175,6 @@ export class BlueskyCommunityBot {
             }
           );
 
-          console.log(`fetched commandState: ${JSON.stringify(record)}`);
-
           const recordValue = record.data.value;
 
           if (
@@ -191,6 +186,10 @@ export class BlueskyCommunityBot {
             if (commandState.authorDid === reply.author.did) {
               const cmd = this.commandMap[commandState.command];
               if (cmd) {
+                console.log(
+                  `[reply] command received from ${reply.author.did}: ${reply.text} (${reply.uri})`
+                );
+        
                 const t = this.getFixedT(
                   reply.langs ? reply.langs : [],
                   commandState.command
@@ -201,7 +200,6 @@ export class BlueskyCommunityBot {
                   try {
                     const recordAtUri = `at://${this.chatBot.profile.did}/${BskyCommunityBotLexicons.ids.AppBikeskyCommunityBotCommandState}/${reply.replyRef?.root.cid}`;
                     await this.chatBot.deleteRecord(recordAtUri);
-                    console.log(`conversation closed: ${recordAtUri}`);
                   } catch (error) {
                     console.log(
                       `failed to delete conversation state: ${JSON.stringify(
@@ -216,11 +214,6 @@ export class BlueskyCommunityBot {
                         .AppBikeskyCommunityBotCommandState,
                       commandResult,
                       reply.replyRef?.root.cid
-                    );
-                    console.log(
-                      `saved conversation state: ${JSON.stringify(
-                        stateSavingResponse
-                      )}`
                     );
                   } catch (error) {
                     console.log(
