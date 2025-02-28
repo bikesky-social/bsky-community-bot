@@ -18,7 +18,7 @@ type BlueskyCommunityBotOptions = {
   selfServeLabelIdentifiers: string[];
   verifiedLabels: string[];
   port: number;
-  labelVerificationEmail: string;
+  labelVerificationEmail?: string;
   defaultLocale: string;
   maxPostLength: number;
 };

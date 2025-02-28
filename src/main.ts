@@ -14,7 +14,7 @@ const bot = new BlueskyCommunityBot({
   verifiedLabels: Env.getOptionalCommaSeparatedEnvVar("VERIFIED_LABELS"),
   port: Env.getRequiredNumberEnvVarOrThrow("PORT"),
   defaultLocale: Env.getRequiredStringEnvVarOrThrow("DEFAULT_LOCALE"),
-  labelVerificationEmail: Env.getRequiredStringEnvVarOrThrow("LABEL_VERIFICATION_EMAIL"),
+  labelVerificationEmail: Env.getOptionalEnvVar("LABEL_VERIFICATION_EMAIL"),
   maxPostLength: Env.getRequiredNumberEnvVarOrThrow("MAX_POST_LENGTH"),
 });
 
