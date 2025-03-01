@@ -20,7 +20,6 @@ export class LabelCommand extends Command {
       this.blueskyCommunityBot.options.maxLabels === -1
         ? Number.MAX_SAFE_INTEGER
         : this.blueskyCommunityBot.options.maxLabels;
-
   }
 
   async mention(
@@ -36,8 +35,8 @@ export class LabelCommand extends Command {
 
     // check if command is available
     if (
-      this.blueskyCommunityBot.labelPoliciesKeeper
-        .hasValidSelfServeLabels === false
+      this.blueskyCommunityBot.labelPoliciesKeeper.hasValidSelfServeLabels ===
+      false
     ) {
       await post.reply({ text: t("error.commandNotAvailable") });
       return conversationClosedResponse;
@@ -50,9 +49,15 @@ export class LabelCommand extends Command {
 
     // check if max labels would be exceeded
     if (selfServeLabels.length >= this.maxLabels) {
-      await post.reply({
-        text: t("error.maxLabels", { maxLabels: this.maxLabels }),
-      });
+      await post.reply(
+        {
+          text: t("error.maxLabels", {
+            maxLabels: this.maxLabels,
+            unlabelCommand: `${this.blueskyCommunityBot.commandPrefix}unlabel`,
+          }),
+        },
+        { resolveFacets: false }
+      );
       return conversationClosedResponse;
     }
 
@@ -71,9 +76,7 @@ export class LabelCommand extends Command {
 
     // generate random label examples
     const rndSelfServeIdentifiers =
-      this.blueskyCommunityBot.options.selfServeLabelIdentifiers.map(
-        (x) => x
-      );
+      this.blueskyCommunityBot.options.selfServeLabelIdentifiers.map((x) => x);
 
     rndSelfServeIdentifiers.sort(() => Math.random() - 0.5);
 
@@ -170,8 +173,7 @@ export class LabelCommand extends Command {
         );
 
       const maxChoice =
-        this.blueskyCommunityBot.options.selfServeLabelIdentifiers
-          .length;
+        this.blueskyCommunityBot.options.selfServeLabelIdentifiers.length;
 
       const indexList: number[] = [];
       reply.text
@@ -213,9 +215,9 @@ export class LabelCommand extends Command {
             for (let j = 0; j < selfServeLabels.length; j++) {
               const selfServeLabelIdentifier = selfServeLabels[j].val;
               if (
-                this.blueskyCommunityBot.options
-                  .selfServeLabelIdentifiers[labelIndex - 1] ===
-                selfServeLabelIdentifier
+                this.blueskyCommunityBot.options.selfServeLabelIdentifiers[
+                  labelIndex - 1
+                ] === selfServeLabelIdentifier
               ) {
                 // invalid response - they already have this label
                 await reply.reply({
@@ -233,10 +235,7 @@ export class LabelCommand extends Command {
           }
         }
 
-        if (
-          indexList.length + selfServeLabels.length >
-          this.maxLabels
-        ) {
+        if (indexList.length + selfServeLabels.length > this.maxLabels) {
           // invalid response - this would result in too many labels
           await reply.reply({
             text: t("error.addingTooManyLabels", {
@@ -311,18 +310,19 @@ export class LabelCommand extends Command {
                     appliedLabelNames: appliedLabelNameString,
                   }) +
                   "\n\n" +
-                  t("post.unlabelInstruction") +
+                  t("post.unlabelInstruction", {
+                    unlabelCommand: `${this.blueskyCommunityBot.commandPrefix}unlabel`,
+                  }) +
                   "\n\n" +
                   t("post.verifiedLabelRequested"),
               },
-              { splitLongPost: true }
+              { splitLongPost: true, resolveFacets: false }
             );
 
             await postRef.reply({
               text: t("post.verificationInstruction", {
                 verificationEmail:
-                  this.blueskyCommunityBot.options
-                    .labelVerificationEmail,
+                  this.blueskyCommunityBot.options.labelVerificationEmail,
               }),
             });
           } else {
@@ -334,9 +334,11 @@ export class LabelCommand extends Command {
                     appliedLabelNames: appliedLabelNameString,
                   }) +
                   "\n\n" +
-                  t("post.unlabelInstruction"),
+                  t("post.unlabelInstruction", {
+                    unlabelCommand: `${this.blueskyCommunityBot.commandPrefix}unlabel`,
+                  }),
               },
-              { splitLongPost: true }
+              { splitLongPost: true, resolveFacets: false }
             );
           }
         } catch (error) {

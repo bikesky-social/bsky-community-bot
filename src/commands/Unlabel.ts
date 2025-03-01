@@ -198,13 +198,15 @@ export class UnlabelCommand extends Command {
               labelNames: removedLabelNameString,
             }) +
             "\n\n" +
-            t("post.successLine2");
+            t("post.successLine2", {
+              labelCommand: `${this.blueskyCommunityBot.commandPrefix}label`,
+            });
 
           await reply.reply(
             {
               text: postText,
             },
-            { splitLongPost: true }
+            { splitLongPost: true, resolveFacets: false }
           );
         } catch (error) {
           console.log(
