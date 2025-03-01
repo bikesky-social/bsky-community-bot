@@ -22,7 +22,7 @@ The unlabel command enables the user to remove Bluesky labels from their account
 
 Bluesky Community Bot supports internationalization for all of its responses and any references it makes to labels. It will attempt to respond to users in the language they use to speak to it. Currently we have translations for English. We'll be adding more translations soon and would welcome any contributions for this in the [locales folder](https://github.com/bikesky-social/bsky-community-bot/tree/main/locales).
 
-## Configuration
+## Configuration as a Web Service
 
 This repo can be deployed as a web service. When deploying as a web service, it is configured using environment variables. The expected environment variables are:
 
