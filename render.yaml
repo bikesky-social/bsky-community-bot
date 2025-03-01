@@ -7,6 +7,7 @@ services:
     envVars:
       - key: BUN_VERSION
         value: 1.2.4
+      # the username of the bluesky labeler's account
       - key: LABELER_BSKY_USERNAME
         sync: false
       - key: LABELER_BSKY_APP_PASSWORD
