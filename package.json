@@ -17,6 +17,9 @@
     "url": "https://linktr.ee/derekvanvliet"
   },
   "repository": "github:bikesky-social/bsky-community-bot",
+  "publishConfig": {
+    "access": "public"
+  },
   "module": "main.ts",
   "type": "module",
   "exports": {
