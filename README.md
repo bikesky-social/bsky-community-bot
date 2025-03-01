@@ -27,34 +27,34 @@ Bluesky Community Bot supports internationalization for all of its responses and
 This repo can be deployed as a web service. When deploying as a web service, it is configured using environment variables. The expected environment variables are:
 
 ```sh
-# the username of the bluesky labeler's account
+# the username of the bluesky labeler's account (required)
 LABELER_BSKY_USERNAME="<labeler's username>"
 
-# an app password for the bluesky labeler's account
+# an app password for the bluesky labeler's account (required)
 LABELER_BSKY_APP_PASSWORD="<labeler's app password>"
 
-# the default locale to use for label names and reply text
+# the default locale to use for label names and reply text (required)
 DEFAULT_LOCALE="en"
 
-# the port for the server to listen on
+# the port for the server to listen on (required)
 PORT=3000
 
-# the maximum length of a post
+# the maximum length of a post (required)
 MAX_POST_LENGTH=300
 
-# the maximum number of labels to allow people to add to their account
+# the maximum number of labels to allow people to add to their account (required)
 # set this to -1 for unlimited labels
 MAX_LABELS=3
 
-# a comma-separated list of identifiers of labels that the bot will offer to apply
+# a comma-separated list of identifiers of labels that the bot will offer to apply (required)
 SELF_SERVE_LABEL_IDENTIFIERS=label-1,label-2,label-3,label-4
 
-# a comma-separated list of identifiers that the bot will 
+# a comma-separated list of identifiers that the bot will (optional)
 # each of these labels should also be in SELF_SERVE_LABEL_IDENTIFIERS
 VERIFIED_LABELS=label-3,label-4
 
-# an email address that the bot will tell people to contact if they ask for a verified label
-LABEL_VERIFICATION_EMAIL="<an email address to refer people to in order to manually verify a label>"
+# an email address that the bot will tell people to contact if they ask for a verified label (required if VERIFIED_LABELS are specified)
+LABEL_VERIFICATION_EMAIL="<verification email address>"
 ```
 
 ## Deploying
