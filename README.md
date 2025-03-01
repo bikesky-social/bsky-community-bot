@@ -6,17 +6,11 @@ A Typescript package that allows people to send commands to an account on Bluesk
 
 The package supports the following commands:
 
-### listcommands
-
-The listcommands command lists all of the commands that the bot will respond to.
-
-### label
-
-The label command enables the user to apply Bluesky labels to their account. It responds by offering them a selection of labels in a post that contains an image that is generated using the labeler account's label definitions. The user then selects labels by responding with numbers. The labels that a user can select are determined by configuration settings. The bot can enforce a maximum number of labels if you want to. And the bot also supports offering labels that require extra verification, which it will provide instructions for instead of applying the labels.
-
-### unlabel
-
-The unlabel command enables the user to remove Bluesky labels from their account which they applied using the label command.
+|Command|Description|
+|:---|:---|
+|listcommands|The listcommands command lists all of the commands that the bot will respond to.|
+|label|The label command enables the user to apply Bluesky labels to their account. It responds by offering them a selection of labels in a post that contains an image that is generated using the labeler account's label definitions. The user then selects labels by responding with numbers. The labels that a user can select are determined by configuration settings. The bot can enforce a maximum number of labels if you want to. And the bot also supports offering labels that require extra verification, which it will provide instructions for instead of applying the labels.|
+|unlabel|The unlabel command enables the user to remove Bluesky labels from their account which they applied using the label command.|
 
 ## Internationalization
 
