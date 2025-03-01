@@ -90,13 +90,3 @@ bun src/main.ts
 ```
 
 This project was created using `bun init` in bun v1.2.4. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
-
-## References
-
-Bluesky Community Bot is built using the following 
-
-
-
-
-
-
