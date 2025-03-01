@@ -24,7 +24,7 @@ Bluesky Community Bot supports internationalization for all of its responses and
 
 ## Configuration as a Web Service
 
-This repo can be deployed as a web service. When deploying as a web service, it is configured using environment variables. The expected environment variables are:
+This repo can be deployed as a web service. When deploying, it is configured using environment variables. The expected environment variables are:
 
 ```sh
 # the username of the bluesky labeler's account (required)
@@ -69,10 +69,46 @@ The easiest way to deploy this service is to use the "Deploy to Render" button b
 
 ### Docker
 
-This service is available on Docker Hub at [bikesky/bsky-community-bot](https://hub.docker.com/r/bikesky/bsky-community-bot). You can run it with the following command:
+This service is available on Docker Hub at [bikesky/bsky-community-bot](https://hub.docker.com/r/bikesky/bsky-community-bot). After setting up a local .env file that has the above variables in it, you can run the container with the following command:
 
 ```sh
 docker run -p 3000:3000 --env-file .env bikesky/bsky-community-bot
+```
+## Package Use
+
+You can install this package in your own project by using a package manger like npm:
+
+```bash
+npm install @bikesky/bsky-community-bot
+```
+
+Once the package is installed, create a BlueskyCommunityBot instance, add some commands to it, and run it like so:
+
+```bash
+import { BlueskyCommunityBot } from "@bikesky/bsky-community-bot";
+import { ListCommandsCommand } from "@bikesky/bsky-community-bot/commands/ListComands";
+import { LabelCommand } from "@bikesky/bsky-community-bot/commands/Label";
+import { UnlabelCommand } from "@bikesky/bsky-community-bot/commands/Unlabel";
+
+const bot = new BlueskyCommunityBot({
+  labelerBskyUsername: "<replace with username>",
+  labelerBskyAppPassword: "<replace with app password>",
+  defaultLocale: "en",
+  port: 3000,
+  maxPostLength: 300,
+  maxLabels: 3,
+  selfServeLabelIdentifiers: ["label-1","label-2","label-3","label-4"],
+  verifiedLabels: ["label-3","label-4"],
+  labelVerificationEmail: "replace.this@example.com",
+});
+
+bot.addCommands([
+  new ListCommandsCommand(bot),
+  new LabelCommand(bot),
+  new UnlabelCommand(bot),
+]);
+
+bot.go();
 ```
 
 ## Development
