@@ -12,13 +12,13 @@ services:
       - key: LABELER_BSKY_APP_PASSWORD
         sync: false
       - key: DEFAULT_LOCALE
-        value: en
+        sync: false
       - key: PORT
-        value: 3000
+        sync: false
       - key: MAX_POST_LENGTH
-        value: 300
+        sync: false
       - key: MAX_LABELS
-        value: -1
+        sync: false
       - key: SELF_SERVE_LABEL_IDENTIFIERS
         sync: false
       - key: VERIFIED_LABELS
