@@ -49,7 +49,7 @@ MAX_LABELS=3
 # a comma-separated list of identifiers of labels that the bot will offer to apply (required)
 SELF_SERVE_LABEL_IDENTIFIERS=label-1,label-2,label-3,label-4
 
-# a comma-separated list of identifiers that the bot will (optional)
+# a comma-separated list of identifiers that the bot will flag as requiring manual verification (optional)
 # each of these labels should also be in SELF_SERVE_LABEL_IDENTIFIERS
 VERIFIED_LABELS=label-3,label-4
 
