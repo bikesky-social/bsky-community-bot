@@ -9,17 +9,7 @@
             "internalConsoleOptions": "neverOpen",
             "request": "launch",
             "name": "Debug Bluesky Community Bot",
-            "program": "${workspaceFolder}/src/dev.ts",
-            "cwd": "${workspaceFolder}",
-            "stopOnEntry": false,
-            "watchMode": false
-        },
-        {
-            "type": "bun",
-            "internalConsoleOptions": "neverOpen",
-            "request": "launch",
-            "name": "Run Bluesky Community Bot",
-            "program": "${workspaceFolder}/src/main.ts",
+            "program": "${workspaceFolder}/main.ts",
             "cwd": "${workspaceFolder}",
             "stopOnEntry": false,
             "watchMode": false

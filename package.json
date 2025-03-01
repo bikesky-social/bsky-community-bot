@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "bun --watch --hot src/dev.ts --inspect",
     "build": "bun install",
-    "start": "bun src/main.ts",
+    "start": "bun main.ts",
     "lexgen": "lex gen-server ./src/lexicon ./lexicons/*"
   },
   "devDependencies": {
