@@ -96,16 +96,17 @@ export class BlueskyCommunityBot {
 
   async go() {
     // initialize i18n
+    const localesDir = __dirname + "/../locales";
     this.i18n.init({
       fallbackLng: this.options.defaultLocale,
       // debug: true,
       initAsync: false,
-      preload: fs.readdirSync("./locales"),
+      preload: fs.readdirSync(localesDir),
       ns: fs
-        .readdirSync(`./locales/${this.options.defaultLocale}`)
+        .readdirSync(`${localesDir}/${this.options.defaultLocale}`)
         .map((fileName: string) => fileName.split(".")[0]),
       backend: {
-        loadPath: "./locales/{{lng}}/{{ns}}.json",
+        loadPath: `${localesDir}/{{lng}}/{{ns}}.json`,
       },
     });
 

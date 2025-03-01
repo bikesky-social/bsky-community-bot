@@ -177,7 +177,8 @@ export class LabelPoliciesKeeper {
     payload.labelOptionsAltText = `image with a title: ${this.blueskyCommunityBot.labelerBot.profile.displayName}.\nbeneath the title is a list of numbered options:`;
 
     if (this.labelerPolicies.labelValueDefinitions) {
-      const font = await opentype.load("./fonts/InterVariable.ttf");
+      const fontDir = __dirname + "/../fonts";
+      const font = await opentype.load(`${fontDir}/InterVariable.ttf`);
 
       const rows = Math.round(
         this.blueskyCommunityBot.options.selfServeLabelIdentifiers.length / 2
@@ -296,7 +297,7 @@ export class LabelPoliciesKeeper {
         ? this.blueskyCommunityBot.labelerBot.profile.displayName
         : "";
 
-      const titleFont = await opentype.load("./fonts/Inter-Black.ttf");
+      const titleFont = await opentype.load(`${fontDir}/Inter-Black.ttf`);
 
       drawText(
         context as any,

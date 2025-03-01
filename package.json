@@ -2,6 +2,10 @@
   "name": "bsky-community-bot",
   "module": "main.ts",
   "type": "module",
+  "exports": {
+    ".": "./src/BlueskyCommunityBot.ts",
+    "./commands/*": "./src/commands/*.ts"
+  },
   "scripts": {
     "dev": "bun --watch --hot src/dev.ts --inspect",
     "build": "bun install",
