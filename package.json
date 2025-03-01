@@ -4,10 +4,10 @@
   "license": "MIT",
   "description": "A Typescript package for running a community bot that people can send commands to by mentioning it in a Bluesky post.",
   "keywords": [
-		"bluesky",
-		"bot",
-		"atproto"
-	],
+    "bluesky",
+    "bot",
+    "atproto"
+  ],
   "bugs": {
     "url": "https://github.com/bikesky-social/bsky-community-bot/issues"
   },
