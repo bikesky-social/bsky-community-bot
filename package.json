@@ -1,5 +1,22 @@
 {
-  "name": "bsky-community-bot",
+  "name": "@bikesky/bsky-community-bot",
+  "version": "0.1.1",
+  "license": "MIT",
+  "description": "A Typescript package for running a community bot that people can send commands to by mentioning it in a Bluesky post.",
+  "keywords": [
+		"bluesky",
+		"bot",
+		"atproto"
+	],
+  "bugs": {
+    "url": "https://github.com/bikesky-social/bsky-community-bot/issues"
+  },
+  "homepage": "https://github.com/bikesky-social/bsky-community-bot",
+  "author": {
+    "name": "Derek van Vliet",
+    "url": "https://bsky.app/profile/did:plc:rgopnvhlbnrpeq4p4jp4qgnt"
+  },
+  "repository": "github:bikesky-social/bsky-community-bot",
   "module": "main.ts",
   "type": "module",
   "exports": {
