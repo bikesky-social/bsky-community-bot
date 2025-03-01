@@ -108,7 +108,7 @@ export class LabelCommand extends Command {
       "\n\n" +
       t("post.instructions", {
         labelExamples: examples.join(", "),
-        numberList: exampleIndexes.join(", "),
+        numberList: exampleIndexes.join(","),
       });
 
     if (this.blueskyCommunityBot.options.verifiedLabels.length > 0) {
