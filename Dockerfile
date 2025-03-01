@@ -4,8 +4,8 @@ FROM oven/bun:latest AS base
 WORKDIR /usr/src/app
 
 # install canvas dependencies
-RUN apt-get update
-RUN apt-get -f install -y python3 build-essential libcairo2-dev libpango1.0-dev
+RUN if ["$TARGETPLATFORM" = "linux/amd64"] ; then echo "no worries" ; else apt-get update ; fi
+RUN if ["$TARGETPLATFORM" = "linux/amd64"] ; then echo "no worries" ; else apt-get install -y python3 build-essential libcairo2-dev libpango1.0-dev ; fi
 
 # install dependencies into temp directory
 # this will cache them and speed up future builds
