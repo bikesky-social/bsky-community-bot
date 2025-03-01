@@ -3,7 +3,7 @@
   "module": "main.ts",
   "type": "module",
   "scripts": {
-    "dev": "bun --watch --hot src/main.ts --inspect",
+    "dev": "bun --watch --hot src/dev.ts --inspect",
     "build": "bun install",
     "start": "bun src/main.ts",
     "lexgen": "lex gen-server ./src/lexicon ./lexicons/*"
