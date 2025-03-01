@@ -14,7 +14,7 @@
   "homepage": "https://github.com/bikesky-social/bsky-community-bot",
   "author": {
     "name": "Derek van Vliet",
-    "url": "https://bsky.app/profile/did:plc:rgopnvhlbnrpeq4p4jp4qgnt"
+    "url": "https://linktr.ee/derekvanvliet"
   },
   "repository": "github:bikesky-social/bsky-community-bot",
   "module": "main.ts",
