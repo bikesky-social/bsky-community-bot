@@ -5,7 +5,7 @@ WORKDIR /usr/src/app
 
 # install canvas dependencies
 RUN apt-get update
-RUN apt-get install -y python3 build-essential libcairo2-dev libpango1.0-dev
+RUN apt-get -f install -y python3 build-essential libcairo2-dev libpango1.0-dev
 
 # install dependencies into temp directory
 # this will cache them and speed up future builds
