@@ -10,17 +10,15 @@ const fs = require("fs");
 import * as BskyCommunityBotLexicons from "./lexicon/lexicons";
 
 type BlueskyCommunityBotOptions = {
-  botBskyUsername: string;
-  botBskyPassword: string;
   labelerBskyUsername: string;
-  labelerBskyPassword: string;
+  labelerBskyAppPassword: string;
+  defaultLocale: string;
+  port: number;
+  maxPostLength: number;
   maxLabels: number;
   selfServeLabelIdentifiers: string[];
   verifiedLabels: string[];
-  port: number;
   labelVerificationEmail?: string;
-  defaultLocale: string;
-  maxPostLength: number;
 };
 
 type CommandMap = {
@@ -31,29 +29,24 @@ export class BlueskyCommunityBot {
   readonly options: BlueskyCommunityBotOptions;
   readonly commandMap: CommandMap = {};
   readonly server = express();
-  readonly chatBot: Bot;
   readonly labelerBot: Bot;
   readonly labelPoliciesKeeper: LabelPoliciesKeeper;
   readonly i18n: typeof i18n;
 
   constructor(options: BlueskyCommunityBotOptions) {
     this.options = options;
-    this.chatBot = new Bot({
+    this.labelerBot = new Bot({
       eventEmitterOptions: {
         strategy: EventStrategy.Firehose,
       },
     });
-    this.labelerBot =
-      this.options.botBskyUsername === this.options.labelerBskyUsername
-        ? this.chatBot
-        : new Bot();
     this.labelPoliciesKeeper = new LabelPoliciesKeeper(this);
     this.i18n = i18n.createInstance().use(Backend);
   }
 
   getCommandByPost(post: Post): Command | undefined {
     const lowerPostText = post.text.toLowerCase();
-    const atUsernameSpace = "@" + this.options.botBskyUsername + " ";
+    const atUsernameSpace = "@" + this.options.labelerBskyUsername + " ";
 
     if (lowerPostText.startsWith(atUsernameSpace)) {
       const handleAndCommand = lowerPostText.split(atUsernameSpace);
@@ -68,12 +61,12 @@ export class BlueskyCommunityBot {
     return undefined;
   }
 
-  addCommand(command:Command) {
+  addCommand(command: Command) {
     console.log(`added command: ${command.commandName}`);
     this.commandMap[command.commandName] = command;
   }
 
-  addCommands(commands:Command[]) {
+  addCommands(commands: Command[]) {
     commands.map((cmd) => this.addCommand(cmd));
   }
 
@@ -99,41 +92,32 @@ export class BlueskyCommunityBot {
 
     console.log("initialized i18n");
 
-    //  initialize chat bots
+    //  initialize labeler bot
 
-    await this.chatBot.login({
-      identifier: this.options.botBskyUsername,
-      password: this.options.botBskyPassword,
+    await this.labelerBot.login({
+      identifier: this.options.labelerBskyUsername,
+      password: this.options.labelerBskyAppPassword,
     });
 
-    console.log("chat bot logged in");
-
-    if (this.options.botBskyUsername != this.options.labelerBskyUsername) {
-      await this.labelerBot.login({
-        identifier: this.options.labelerBskyUsername,
-        password: this.options.labelerBskyPassword,
-      });
-
-      console.log("labeler bot logged in");
-    }
+    console.log("labeler bot logged in");
 
     await this.labelPoliciesKeeper.init();
 
-    // chat bot handlers
+    // labeler bot handlers
 
-    this.chatBot.on("open", async () => {
-      console.log("open: the chat bot has begun listening for events");
+    this.labelerBot.on("open", async () => {
+      console.log("open: labeler bot has begun listening for events");
     });
 
-    this.chatBot.on("close", async () => {
-      console.log("closed: the chat bot has stopped listening for events");
+    this.labelerBot.on("close", async () => {
+      console.log("closed: labeler bot has stopped listening for events");
     });
 
-    this.chatBot.on("error", async (error) => {
-      console.log(`chat bot error occurred: ${error}`);
+    this.labelerBot.on("error", async (error) => {
+      console.log(`labeler bot error occurred: ${error}`);
     });
 
-    this.chatBot.on("mention", async (post) => {
+    this.labelerBot.on("mention", async (post) => {
       const cmd = this.getCommandByPost(post);
 
       if (cmd) {
@@ -145,7 +129,7 @@ export class BlueskyCommunityBot {
         const commandResult = await cmd.mention(post, t);
         if (commandResult.state != CommandStates.Closed) {
           try {
-            const stateSavingResponse = await this.chatBot.putRecord(
+            const stateSavingResponse = await this.labelerBot.putRecord(
               BskyCommunityBotLexicons.ids.AppBikeskyCommunityBotCommandState,
               commandResult,
               post.cid
@@ -159,14 +143,14 @@ export class BlueskyCommunityBot {
       }
     });
 
-    this.chatBot.on("reply", async (reply) => {
+    this.labelerBot.on("reply", async (reply) => {
       if (reply.replyRef?.root.cid) {
         try {
-          const record = await this.chatBot.agent.get(
+          const record = await this.labelerBot.agent.get(
             "com.atproto.repo.getRecord",
             {
               params: {
-                repo: this.chatBot.profile.did,
+                repo: this.labelerBot.profile.did,
                 collection:
                   BskyCommunityBotLexicons.ids
                     .AppBikeskyCommunityBotCommandState,
@@ -189,7 +173,7 @@ export class BlueskyCommunityBot {
                 console.log(
                   `[reply] command received from ${reply.author.did}: ${reply.text} (${reply.uri})`
                 );
-        
+
                 const t = this.getFixedT(
                   reply.langs ? reply.langs : [],
                   commandState.command
@@ -198,8 +182,8 @@ export class BlueskyCommunityBot {
 
                 if (commandResult.state === CommandStates.Closed) {
                   try {
-                    const recordAtUri = `at://${this.chatBot.profile.did}/${BskyCommunityBotLexicons.ids.AppBikeskyCommunityBotCommandState}/${reply.replyRef?.root.cid}`;
-                    await this.chatBot.deleteRecord(recordAtUri);
+                    const recordAtUri = `at://${this.labelerBot.profile.did}/${BskyCommunityBotLexicons.ids.AppBikeskyCommunityBotCommandState}/${reply.replyRef?.root.cid}`;
+                    await this.labelerBot.deleteRecord(recordAtUri);
                   } catch (error) {
                     console.log(
                       `failed to delete conversation state: ${JSON.stringify(
@@ -209,7 +193,7 @@ export class BlueskyCommunityBot {
                   }
                 } else {
                   try {
-                    const stateSavingResponse = await this.chatBot.putRecord(
+                    const stateSavingResponse = await this.labelerBot.putRecord(
                       BskyCommunityBotLexicons.ids
                         .AppBikeskyCommunityBotCommandState,
                       commandResult,

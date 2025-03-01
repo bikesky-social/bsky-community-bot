@@ -108,7 +108,7 @@ export class LabelPoliciesKeeper {
     try {
       await agent.login({
         identifier: this.blueskyCommunityBot.options.labelerBskyUsername,
-        password: this.blueskyCommunityBot.options.labelerBskyPassword,
+        password: this.blueskyCommunityBot.options.labelerBskyAppPassword,
       });
     } catch (error) {
       return false;

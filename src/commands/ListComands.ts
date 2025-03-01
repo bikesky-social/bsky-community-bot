@@ -27,7 +27,7 @@ export class ListCommandsCommand extends Command {
       const commandKey = commandKeys[i];
       const command =
         this.blueskyCommunityBot.commandMap[commandKey];
-      const commandString = `@${this.blueskyCommunityBot.options.botBskyUsername} ${command.commandName}\n`;
+      const commandString = `@${this.blueskyCommunityBot.options.labelerBskyUsername} ${command.commandName}\n`;
 
       if (
         currentPost.length + commandString.length <=
