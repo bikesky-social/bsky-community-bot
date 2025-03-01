@@ -8,10 +8,6 @@ name: Publish to Github Container Registry
 on:
   release:
     types: [published]
-  push:
-    branches: ["main"]
-    # Publish semver tags as releases.
-    tags: ["v*.*.*"]
 
 env:
   # Use docker.io for Docker Hub if empty
