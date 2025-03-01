@@ -6,7 +6,7 @@ A Typescript package that allows people to send commands to an account on Bluesk
 
 Commands are sent to the bot by making a post on Bluesky that mentions the account followed by a command name. For example, you would send this post to run the label command:
 
-```sh
+```bash
 @labeler.bikesky.social label
 ```
 
@@ -26,7 +26,7 @@ Bluesky Community Bot supports internationalization for all of its responses and
 
 This repo can be deployed as a web service. When deploying, it is configured using environment variables. The expected environment variables are:
 
-```sh
+```bash
 # the username of the bluesky labeler's account (required)
 LABELER_BSKY_USERNAME="<labeler's username>"
 
@@ -71,7 +71,7 @@ The easiest way to deploy this service is to use the "Deploy to Render" button b
 
 This service is available on Docker Hub at [bikesky/bsky-community-bot](https://hub.docker.com/r/bikesky/bsky-community-bot). After setting up a local .env file that has the above variables in it, you can run the container with the following command:
 
-```sh
+```bash
 docker run -p 3000:3000 --env-file .env bikesky/bsky-community-bot
 ```
 ## Package Use
@@ -84,7 +84,7 @@ npm install @bikesky/bsky-community-bot
 
 Once the package is installed, create a BlueskyCommunityBot instance, add some commands to it, and run it like so:
 
-```bash
+```typescript
 import { BlueskyCommunityBot } from "@bikesky/bsky-community-bot";
 import { ListCommandsCommand } from "@bikesky/bsky-community-bot/commands/ListComands";
 import { LabelCommand } from "@bikesky/bsky-community-bot/commands/Label";
@@ -113,16 +113,14 @@ bot.go();
 
 ## Development
 
-To install dependencies:
+To work on this repo, install dependencies with a package manager such as bun:
 
 ```bash
 bun install
 ```
 
-To run:
+And then run with this command:
 
 ```bash
 bun main.ts
 ```
-
-This project was created using `bun init` in bun v1.2.4. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
