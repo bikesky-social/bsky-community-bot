@@ -88,6 +88,12 @@ export class BlueskyCommunityBot {
     return this.i18n.getFixedT(lngsWithFallback, namespace);
   }
 
+  getCommandRecordKeyFromPost(post: Post) {
+    return post.replyRef
+      ? `${post.replyRef.root.cid}.${post.author.did}`
+      : `${post.cid}.${post.author.did}`;
+  }
+
   async go() {
     // initialize i18n
     this.i18n.init({
@@ -124,7 +130,7 @@ export class BlueskyCommunityBot {
         identifier: this.options.devChatBotBskyUsername,
         password: this.options.devChatBotBskyAppPassword,
       });
-  
+
       console.log("dev chat bot logged in");
     }
 
@@ -155,11 +161,12 @@ export class BlueskyCommunityBot {
         const t = this.getFixedT(post.langs ? post.langs : [], cmd.commandName);
         const commandResult = await cmd.mention(post, t);
         if (commandResult.state != CommandStates.Closed) {
+          const commandRecordKey = this.getCommandRecordKeyFromPost(post);
           try {
             const stateSavingResponse = await this.chatBot.putRecord(
               BskyCommunityBotLexicons.ids.AppBikeskyCommunityBotCommandState,
               commandResult,
-              post.cid
+              commandRecordKey
             );
           } catch (error) {
             console.log(
@@ -172,6 +179,7 @@ export class BlueskyCommunityBot {
 
     this.chatBot.on("reply", async (reply) => {
       if (reply.replyRef?.root.cid) {
+        const commandRecordKey = this.getCommandRecordKeyFromPost(reply);
         try {
           const record = await this.chatBot.agent.get(
             "com.atproto.repo.getRecord",
@@ -181,7 +189,7 @@ export class BlueskyCommunityBot {
                 collection:
                   BskyCommunityBotLexicons.ids
                     .AppBikeskyCommunityBotCommandState,
-                rkey: reply.replyRef?.root.cid,
+                rkey: commandRecordKey,
               },
             }
           );
@@ -209,7 +217,7 @@ export class BlueskyCommunityBot {
 
                 if (commandResult.state === CommandStates.Closed) {
                   try {
-                    const recordAtUri = `at://${this.chatBot.profile.did}/${BskyCommunityBotLexicons.ids.AppBikeskyCommunityBotCommandState}/${reply.replyRef?.root.cid}`;
+                    const recordAtUri = `at://${this.chatBot.profile.did}/${BskyCommunityBotLexicons.ids.AppBikeskyCommunityBotCommandState}/${commandRecordKey}`;
                     await this.chatBot.deleteRecord(recordAtUri);
                   } catch (error) {
                     console.log(
@@ -224,7 +232,7 @@ export class BlueskyCommunityBot {
                       BskyCommunityBotLexicons.ids
                         .AppBikeskyCommunityBotCommandState,
                       commandResult,
-                      reply.replyRef?.root.cid
+                      commandRecordKey
                     );
                   } catch (error) {
                     console.log(
