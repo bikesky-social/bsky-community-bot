@@ -4,6 +4,12 @@ A Typescript package that allows people to send commands to an account on Bluesk
 
 ## Commands
 
+Commands are sent to the bot by making a post on Bluesky that mentions the account followed by a command name, for example:
+
+```sh
+@labeler.bikesky.social listcommands
+```
+
 The package supports the following commands:
 
 |Command|Description|
