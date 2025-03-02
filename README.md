@@ -76,7 +76,7 @@ docker run -p 3000:3000 --env-file .env bikesky/bsky-community-bot
 ```
 ## Package Use
 
-You can install this package in your own project by using a package manger like npm:
+You can install this package in your own project by using a package manager like npm:
 
 ```bash
 npm install @bikesky/bsky-community-bot
