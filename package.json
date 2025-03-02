@@ -26,6 +26,12 @@
     ".": "./src/BlueskyCommunityBot.ts",
     "./commands/*": "./src/commands/*.ts"
   },
+  "files": [
+    "src",
+    "fonts",
+    "locales",
+    "package.json"
+  ],
   "scripts": {
     "dev": "bun --watch --hot src/dev.ts --inspect",
     "build": "bun install",
