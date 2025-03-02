@@ -174,7 +174,11 @@ export class LabelPoliciesKeeper {
     const innerMarginVertical = 10;
     const innerMarginHorizontal = 10;
 
-    payload.labelOptionsAltText = `image with a title: ${this.blueskyCommunityBot.labelerBot.profile.displayName}.\nbeneath the title is a list of numbered options:`;
+    const t = this.blueskyCommunityBot.getFixedT(locales, "label");
+    payload.labelOptionsAltText = t("post.labelsAltText", {
+      labelerDisplayName:
+        this.blueskyCommunityBot.labelerBot.profile.displayName,
+    });
 
     if (this.labelerPolicies.labelValueDefinitions) {
       const fontDir = __dirname + "/../fonts";
