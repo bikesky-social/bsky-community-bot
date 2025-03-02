@@ -69,7 +69,7 @@ The easiest way to deploy this service is to use the "Deploy to Render" button b
 
 ### Docker
 
-This service is available on Docker Hub at [bikesky/bsky-community-bot](https://hub.docker.com/r/bikesky/bsky-community-bot). After setting up a local .env file that has the above variables in it, you can run the container with the following command:
+This service is available on [Github Container Registry](https://github.com/bikesky-social/bsky-community-bot/pkgs/container/bsky-community-bot) and on [Docker Hub](https://hub.docker.com/r/bikesky/bsky-community-bot). After setting up a local .env file that has the above variables in it, you can run the container with the following command:
 
 ```bash
 docker run -p 3000:3000 --env-file .env bikesky/bsky-community-bot
