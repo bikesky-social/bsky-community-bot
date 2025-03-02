@@ -103,6 +103,16 @@ export class LabelCommand extends Command {
           exampleIdent
         )
       );
+
+      while (
+        examples.join(", ").length + exampleIndexes.join(",").length >
+          maxExampleLength &&
+        examples.length > 0 &&
+        exampleIndexes.length > 0
+      ) {
+        examples.pop();
+        exampleIndexes.pop();
+      }
     }
 
     // construct the post text
