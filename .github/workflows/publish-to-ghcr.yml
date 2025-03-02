@@ -1,4 +1,4 @@
-name: Publish Container to Github Container Registry
+name: Publish to Github Container Registry
 
 on:
   release:
