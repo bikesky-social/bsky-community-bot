@@ -86,7 +86,7 @@ export class LabelCommand extends Command {
 
     while (
       examples.length < this.blueskyCommunityBot.options.maxLabels &&
-      examples.join(", ").length + exampleIndexes.join(", ").length <
+      examples.join(", ").length + exampleIndexes.join(",").length <
         maxExampleLength &&
       rndSelfServeIdentifiers.length > 0
     ) {
