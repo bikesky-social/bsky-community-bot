@@ -20,6 +20,9 @@ export class LabelPoliciesKeeper {
     labelValueDefinitions: [],
   };
   hasValidSelfServeLabels: boolean = false;
+  labelOptionsImagePayloadCache: {
+    [locale: string]: LabelOptionsImagePayload;
+  } = {};
 
   constructor(blueskyCommunityBot: BlueskyCommunityBot) {
     this.blueskyCommunityBot = blueskyCommunityBot;
@@ -122,6 +125,8 @@ export class LabelPoliciesKeeper {
       this.labelerPolicies = labelDefs.data.views[0]
         .policies as LabelerPolicies;
 
+      this.labelOptionsImagePayloadCache = {};
+
       console.log("updated label defs");
 
       if (this.validateSelfServeLabels() && this.validateVerifiedLabels()) {
@@ -159,9 +164,27 @@ export class LabelPoliciesKeeper {
     return new Blob([ia], { type: mimeString });
   }
 
+  getLabelOptionsImagePayloadCacheKey(locales: string[]) {
+    return locales.join(",");
+  }
+
+  getCachedLabelOptionsImagePayload(locales: string[]) {
+    const key = this.getLabelOptionsImagePayloadCacheKey(locales);
+    if (key in this.labelOptionsImagePayloadCache) {
+      return this.labelOptionsImagePayloadCache[key];
+    }
+
+    return undefined;
+  }
+
   async getLabelOptionsImagePayload(
     locales: string[]
   ): Promise<LabelOptionsImagePayload> {
+    const cache = this.getCachedLabelOptionsImagePayload(locales);
+    if (cache) {
+      return cache;
+    }
+
     const payload: LabelOptionsImagePayload = {
       labelOptionsAltText: "",
       labelOptionsCanvas: new Canvas(1, 1),
@@ -360,12 +383,16 @@ export class LabelPoliciesKeeper {
 
     console.log(`generated label options image for locales: ${locales}`);
 
+    this.labelOptionsImagePayloadCache[
+      this.getLabelOptionsImagePayloadCacheKey(locales)
+    ] = payload;
+
     return payload;
   }
 
   async getLabelImageRoute(req: Request, res: Response) {
     const imageOptionsPayload = await this.getLabelOptionsImagePayload(
-      req.params["locale"] ? [req.params["locale"] as string] : []
+      req.query["locale"] ? [req.query["locale"] as string] : []
     );
     res.type("png");
     res.end(imageOptionsPayload.labelOptionsCanvas.toBuffer("image/png"));
