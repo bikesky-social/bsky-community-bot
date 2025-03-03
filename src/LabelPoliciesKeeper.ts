@@ -6,6 +6,7 @@ import type { ComAtprotoLabelDefs } from "@atcute/client/lexicons";
 import { Canvas, loadImage } from "canvas";
 import opentype from "opentype.js";
 import drawText from "node-canvas-text";
+import emojiRegex from "emoji-regex";
 
 type LabelOptionsImagePayload = {
   labelOptionsCanvas: Canvas;
@@ -298,15 +299,21 @@ export class LabelPoliciesKeeper {
           height: rowHeight - innerMarginVertical * 2,
         };
 
-        drawText(context as any, labelName, font, textRect, {
-          minSize: 13,
-          maxSize: 32,
-          vAlign: "bottom",
-          hAlign: "left",
-          fitMethod: "baseline",
-          textFillStyle: "#fff",
-          drawRect: false,
-        });
+        drawText(
+          context as any,
+          labelName.replace(emojiRegex(), "").trim(),
+          font,
+          textRect,
+          {
+            minSize: 13,
+            maxSize: 32,
+            vAlign: "bottom",
+            hAlign: "left",
+            fitMethod: "baseline",
+            textFillStyle: "#fff",
+            drawRect: false,
+          }
+        );
       }
 
       const logoRadius = 70;
@@ -322,7 +329,7 @@ export class LabelPoliciesKeeper {
 
       drawText(
         context as any,
-        displayName,
+        displayName.replace(emojiRegex(), "").trim(),
         titleFont,
         {
           x: marginHorizontal * 1.5 + logoRadius * 2,
