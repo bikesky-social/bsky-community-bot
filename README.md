@@ -26,7 +26,7 @@ Bluesky Community Bot supports internationalization for all of its responses and
 
 This repo can be deployed as a web service. When deploying, it is configured using environment variables. The expected environment variables are:
 
-```bash
+```env
 # the username of the bluesky labeler's account (required)
 LABELER_BSKY_USERNAME=replace_with_username
 
