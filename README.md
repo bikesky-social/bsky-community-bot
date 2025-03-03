@@ -70,11 +70,22 @@ The easiest way to deploy this service is to use the "Deploy to Render" button b
 
 ### Docker
 
-This service is available on [Github Container Registry](https://github.com/bikesky-social/bsky-community-bot/pkgs/container/bsky-community-bot) and on [Docker Hub](https://hub.docker.com/r/bikesky/bsky-community-bot). After setting up a local .env file that has the above variables in it, you can run the container with the following command:
+This service is available on [Github Container Registry](https://github.com/bikesky-social/bsky-community-bot/pkgs/container/bsky-community-bot) and on [Docker Hub](https://hub.docker.com/r/bikesky/bsky-community-bot). You can run the container with the following command:
 
 ```bash
-docker run -p 3000:3000 --env-file .env bikesky/bsky-community-bot
+docker run -p 3000:3000 \
+-e LABELER_BSKY_USERNAME=replace_with_username \
+-e LABELER_BSKY_APP_PASSWORD=replace_with_password \
+-e DEFAULT_LOCALE=en \
+-e PORT=3000 \
+-e MAX_POST_LENGTH=300 \
+-e MAX_LABELS=3 \
+-e SELF_SERVE_LABEL_IDENTIFIERS=label-1,label-2,label-3,label-4 \
+-e VERIFIED_LABELS=label-3,label-4 \
+-e LABEL_VERIFICATION_EMAIL=replace_with_email_address \
+bikesky/bsky-community-bot
 ```
+
 ## Package Use
 
 You can install this package in your own project by using a package manager like npm:
