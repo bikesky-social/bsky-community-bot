@@ -240,24 +240,18 @@ export class LabelPoliciesKeeper {
 
       for (
         let i = 0;
-        i < this.labelerPolicies.labelValueDefinitions.length;
+        i < this.blueskyCommunityBot.options.selfServeLabelIdentifiers.length;
         i++
       ) {
-        const label = this.labelerPolicies.labelValueDefinitions[i];
-        if (
-          this.blueskyCommunityBot.options.selfServeLabelIdentifiers.includes(
-            label.identifier
-          ) === false
-        ) {
-          continue;
-        }
+        const labelIdentifier =
+          this.blueskyCommunityBot.options.selfServeLabelIdentifiers[i];
 
         const labelText =
           this.blueskyCommunityBot.options.verifiedLabels.includes(
-            label.identifier
+            labelIdentifier
           )
-            ? `${this.getLabelName(label.identifier, locales)}*`
-            : this.getLabelName(label.identifier, locales);
+            ? `${this.getLabelName(labelIdentifier, locales)}*`
+            : this.getLabelName(labelIdentifier, locales);
         const labelName = `${i + 1}. ${labelText}`;
 
         payload.labelOptionsAltText = payload.labelOptionsAltText.concat(

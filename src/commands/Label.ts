@@ -279,8 +279,9 @@ export class LabelCommand extends Command {
       for (let i = 0; i < indexList.length; i++) {
         const labelIndex = indexList[i] - 1;
         const labelIdentifier =
-          this.blueskyCommunityBot.labelPoliciesKeeper.labelerPolicies
-            .labelValues[labelIndex];
+          this.blueskyCommunityBot.options.selfServeLabelIdentifiers[
+            labelIndex
+          ];
 
         if (
           this.blueskyCommunityBot.options.verifiedLabels.includes(
