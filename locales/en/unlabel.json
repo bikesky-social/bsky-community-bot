@@ -1,7 +1,7 @@
 {
   "post": {
     "intro": "Here is a list of labels that are on your account:",
-    "replyInstructions": "Please reply with the numbers of the labels you would like separated by commas. For example, if you want to remove all of them, reply with: {{numberList}}",
+    "replyInstructions": "Please reply with the numbers of the labels you want to remove separated by commas. For example, if you want to remove all of them, reply with: {{numberList}}",
     "successLine1": "Okay, I removed these labels from your account: {{labelNames}}",
     "successLine2": "If you ever want to add more labels, send me a post that says: {{labelCommand}}"
   },
