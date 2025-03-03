@@ -420,7 +420,12 @@ export class LabelPoliciesKeeper {
     if (profile.data.labels) {
       for (let i = 0; i < profile.data.labels.length; i++) {
         const label = profile.data.labels[i];
-        if (this.labelerPolicies.labelValues.includes(label.val)) {
+        if (
+          this.labelerPolicies.labelValues.includes(label.val) &&
+          this.blueskyCommunityBot.options.selfServeLabelIdentifiers.includes(
+            label.val
+          )
+        ) {
           selfServeLabels.push(label);
         }
       }
