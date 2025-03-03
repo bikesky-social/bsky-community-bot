@@ -3,11 +3,11 @@
     "intro": "Here is a list of labels that are on your account:",
     "replyInstructions": "Please reply with the numbers of the labels you would like separated by commas. For example, if you want to remove all of them, reply with: {{numberList}}",
     "successLine1": "Okay, I removed these labels from your account: {{labelNames}}",
-    "successLine2": "If you ever want to add more labels, you can do so by sending me a post that says: {{labelCommand}}"
+    "successLine2": "If you ever want to add more labels, send me a post that says: {{labelCommand}}"
   },
   "error": {
     "commandNotAvailable": "This command is not available at the moment. Please try again later.",
-    "noLabelsFound": "Your account does not have any of our labels on it. If you would like to add some, you can do this by sending the 'label' command to this account.",
+    "noLabelsFound": "Your account does not have any of our labels on it. If you want to add some, send me a post that says: {{labelCommand}}",
     "invalidNumber": "Not all of these choices are valid numbers. Can you please try again?",
     "invalidChoices": "Not all of these choices are valid. Can you please try again?",
     "duplicateChoices": "Not all of these choices are unique. Can you please try again?"

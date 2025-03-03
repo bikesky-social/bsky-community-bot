@@ -75,9 +75,14 @@ export class UnlabelCommand extends Command {
         state: UnlabelCommandStates.WaitingForUnlabelChoices,
       };
     } else {
-      await post.reply({
-        text: t("error.noLabelsFound"),
-      });
+      await post.reply(
+        {
+          text: t("error.noLabelsFound", {
+            labelCommand: `${this.blueskyCommunityBot.commandPrefix}label`,
+          }),
+        },
+        { resolveFacets: false }
+      );
 
       return conversationClosedResponse;
     }

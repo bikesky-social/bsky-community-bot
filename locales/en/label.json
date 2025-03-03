@@ -2,15 +2,15 @@
   "post": {
     "intro": "Let's get you some labels!",
     "instructions":"Here's a list of our labels. Please reply with the numbers of the labels you would like separated by commas. For example, if you want ({{labelExamples}}), reply with: {{numberList}}",
-    "verification":"*Labels with asterisks will require manual verification",
+    "verification":"* Labels with asterisks will require manual verification",
     "labelsAltText":"Image with a title: {{labelerDisplayName}}. Beneath the title is a list of numbered options:",
     "success":"Okay, I put these labels on your account: {{appliedLabelNames}}",
-    "unlabelInstruction":"If you ever want to remove a label, you can do so by sending me a post that says: {{unlabelCommand}}",
+    "unlabelInstruction":"If you ever want to remove a label, send me a post that says: {{unlabelCommand}}",
     "verifiedLabelRequested":"One or more of the labels you asked for needs manual verification ...",
     "verificationInstruction":"To continue with verification, can you send an email to {{verificationEmail}} that includes:\n\n1. Your Bluesky handle\n2. The verified label you would like\n\nIt helps if the email comes from a domain that relates to the label, but if that isn't possible, we can still figure it out"
   },
   "error": {
-    "maxLabels": "Your account already has the maximum number of labels that we allow ({{maxLabels}}). If you would like to switch to some new labels, you can remove labels from your account by sending me a post that says: {{unlabelCommand}}",
+    "maxLabels": "Your account already has the maximum number of labels that we allow ({{maxLabels}}). If you want to switch to some new labels, you can remove labels from your account by sending me a post that says: {{unlabelCommand}}",
     "commandNotAvailable": "This command is not available at the moment. please try again later.",
     "invalidNumber": "Not all of these choices are valid numbers. Can you please try again?",
     "invalidChoice": "Not all of these choices are valid. Can you please try again?",
