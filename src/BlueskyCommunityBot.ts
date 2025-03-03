@@ -59,7 +59,7 @@ export class BlueskyCommunityBot {
   }
 
   getCommandByPost(post: Post): Command | undefined {
-    const lowerPostText = post.text.toLowerCase();
+    const lowerPostText = post.text.trim().toLowerCase();
 
     if (lowerPostText.startsWith(this.commandPrefix)) {
       const handleAndCommand = lowerPostText.split(this.commandPrefix);
