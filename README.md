@@ -28,13 +28,13 @@ This repo can be deployed as a web service. When deploying, it is configured usi
 
 ```bash
 # the username of the bluesky labeler's account (required)
-LABELER_BSKY_USERNAME="<labeler's username>"
+LABELER_BSKY_USERNAME=replace_with_username
 
 # an app password for the bluesky labeler's account (required)
-LABELER_BSKY_APP_PASSWORD="<labeler's app password>"
+LABELER_BSKY_APP_PASSWORD=replace_with_password
 
 # the default locale to use for label names and reply text (required)
-DEFAULT_LOCALE="en"
+DEFAULT_LOCALE=en
 
 # the port for the server to listen on (required)
 PORT=3000
@@ -55,7 +55,7 @@ SELF_SERVE_LABEL_IDENTIFIERS=label-1,label-2,label-3,label-4
 VERIFIED_LABELS=label-3,label-4
 
 # an email address that the bot will tell people to contact if they ask for a verified label (required if VERIFIED_LABELS are specified)
-LABEL_VERIFICATION_EMAIL="<verification email address>"
+LABEL_VERIFICATION_EMAIL=replace_with_email_address
 ```
 
 ## Deploying
