@@ -33,7 +33,7 @@
     "package.json"
   ],
   "scripts": {
-    "dev": "bun --watch --hot src/dev.ts --inspect",
+    "dev": "bun --watch --hot main.ts --inspect",
     "build": "bun install",
     "start": "bun main.ts",
     "lexgen": "lex gen-server ./src/lexicon ./lexicons/*"
