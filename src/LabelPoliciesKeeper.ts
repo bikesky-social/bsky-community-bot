@@ -357,11 +357,6 @@ export class LabelPoliciesKeeper {
         radius: 70,
       };
 
-      context.beginPath();
-      context.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2, true);
-      context.closePath();
-      context.clip();
-
       const avatar = await loadImage(
         this.blueskyCommunityBot.labelerBot.profile.avatar as string
       );
@@ -369,6 +364,19 @@ export class LabelPoliciesKeeper {
       const aspectRatio = avatar.height / avatar.width;
       const hsx = circle.radius * Math.max(1.0 / aspectRatio, 1.0);
       const hsy = circle.radius * Math.max(aspectRatio, 1.0);
+
+      context.beginPath();
+      context.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2, true);
+      // context.roundRect(
+      //   circle.x - hsx,
+      //   circle.y - hsy,
+      //   hsx * 2,
+      //   hsy * 2,
+      //   12.4444
+      // )
+      context.closePath();
+      context.clip();
+
       context.drawImage(
         avatar,
         circle.x - hsx,
