@@ -18,7 +18,7 @@ export class Command {
 
   async mention(
     post: Post,
-    t: TFunction<string, undefined>
+    translate: TFunction<string, undefined>
   ): Promise<CommandState.Record> {
     console.log("unhandled mention: " + post);
 
@@ -33,7 +33,7 @@ export class Command {
   async reply(
     commandState: CommandState.Record,
     reply: Post,
-    t: TFunction<string, undefined>
+    translate: TFunction<string, undefined>
   ): Promise<CommandState.Record> {
     console.log("unhandled reply: " + reply);
 

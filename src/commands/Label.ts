@@ -24,7 +24,7 @@ export class LabelCommand extends Command {
 
   async mention(
     post: Post,
-    t: TFunction<string, undefined>
+    translate: TFunction<string, undefined>
   ): Promise<CommandState.Record> {
     const conversationClosedResponse: CommandState.Record = {
       $type: "app.bikesky.communityBot.commandState",
@@ -38,7 +38,7 @@ export class LabelCommand extends Command {
       this.blueskyCommunityBot.labelPoliciesKeeper.hasValidSelfServeLabels ===
       false
     ) {
-      await post.reply({ text: t("error.commandNotAvailable") });
+      await post.reply({ text: translate("error.commandNotAvailable") });
       return conversationClosedResponse;
     }
 
@@ -51,7 +51,7 @@ export class LabelCommand extends Command {
     if (selfServeLabels.length >= this.maxLabels) {
       await post.reply(
         {
-          text: t("error.maxLabels", {
+          text: translate("error.maxLabels", {
             maxLabels: this.maxLabels,
             unlabelCommand: `${this.blueskyCommunityBot.commandPrefix}unlabel`,
           }),
@@ -63,12 +63,12 @@ export class LabelCommand extends Command {
 
     // calculate the length of the post without examples populated
     let emptyPost =
-      t("post.intro") +
+      translate("post.intro") +
       "\n\n" +
-      t("post.instructions", { labelExamples: "", numberList: "" });
+      translate("post.instructions", { labelExamples: "", numberList: "" });
 
     if (this.blueskyCommunityBot.options.verifiedLabels.length > 0) {
-      emptyPost += "\n\n" + t("post.verification");
+      emptyPost += "\n\n" + translate("post.verification");
     }
 
     const maxExampleLength =
@@ -117,15 +117,15 @@ export class LabelCommand extends Command {
 
     // construct the post text
     let postText =
-      t("post.intro") +
+      translate("post.intro") +
       "\n\n" +
-      t("post.instructions", {
+      translate("post.instructions", {
         labelExamples: examples.join(", "),
         numberList: exampleIndexes.join(","),
       });
 
     if (this.blueskyCommunityBot.options.verifiedLabels.length > 0) {
-      postText += "\n\n" + t("post.verification");
+      postText += "\n\n" + translate("post.verification");
     }
 
     // fetch the image payload
@@ -160,7 +160,7 @@ export class LabelCommand extends Command {
   async reply(
     commandState: CommandState.Record,
     reply: Post,
-    t: TFunction<string, undefined>
+    translate: TFunction<string, undefined>
   ): Promise<CommandState.Record> {
     const conversationClosedResponse: CommandState.Record = {
       $type: "app.bikesky.communityBot.commandState",
@@ -200,25 +200,25 @@ export class LabelCommand extends Command {
           if (isNaN(labelIndex)) {
             // invalid response - not a number
             await reply.reply({
-              text: t("error.invalidNumber"),
+              text: translate("error.invalidNumber"),
             });
             return stillWaitingResponse;
           } else if (Number.isInteger(labelIndex) === false) {
             // invalid response - not an integer
             await reply.reply({
-              text: t("error.invalidNumber"),
+              text: translate("error.invalidNumber"),
             });
             return stillWaitingResponse;
           } else if (Number.isSafeInteger(labelIndex) === false) {
             // invalid response - not a safe integer
             await reply.reply({
-              text: t("error.invalidNumber"),
+              text: translate("error.invalidNumber"),
             });
             return stillWaitingResponse;
           } else if (labelIndex < 1 || labelIndex > maxChoice) {
             // invalid response - outside of range
             await reply.reply({
-              text: t("error.invalidChoice"),
+              text: translate("error.invalidChoice"),
             });
             return stillWaitingResponse;
           } else {
@@ -231,7 +231,7 @@ export class LabelCommand extends Command {
               ) {
                 // invalid response - they already have this label
                 await reply.reply({
-                  text: t("error.duplicateLabel", {
+                  text: translate("error.duplicateLabel", {
                     labelName:
                       this.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(
                         selfServeLabelIdentifier,
@@ -248,7 +248,7 @@ export class LabelCommand extends Command {
         if (indexList.length + selfServeLabels.length > this.maxLabels) {
           // invalid response - this would result in too many labels
           await reply.reply({
-            text: t("error.addingTooManyLabels", {
+            text: translate("error.addingTooManyLabels", {
               maxLabels: this.maxLabels,
             }),
           });
@@ -258,7 +258,7 @@ export class LabelCommand extends Command {
         if (indexList.length != uniqueIndeces.length) {
           // invalid response - not all unique choices
           await reply.reply({
-            text: t("error.duplicateChoices"),
+            text: translate("error.duplicateChoices"),
           });
           return stillWaitingResponse;
         }
@@ -317,21 +317,21 @@ export class LabelCommand extends Command {
             const postRef = await reply.reply(
               {
                 text:
-                  t("post.success", {
+                  translate("post.success", {
                     appliedLabelNames: appliedLabelNameString,
                   }) +
                   "\n\n" +
-                  t("post.unlabelInstruction", {
+                  translate("post.unlabelInstruction", {
                     unlabelCommand: `${this.blueskyCommunityBot.commandPrefix}unlabel`,
                   }) +
                   "\n\n" +
-                  t("post.verifiedLabelRequested"),
+                  translate("post.verifiedLabelRequested"),
               },
               { splitLongPost: true, resolveFacets: false }
             );
 
             await postRef.reply({
-              text: t("post.verificationInstruction", {
+              text: translate("post.verificationInstruction", {
                 verificationEmail:
                   this.blueskyCommunityBot.options.labelVerificationEmail,
               }),
@@ -341,11 +341,11 @@ export class LabelCommand extends Command {
             await reply.reply(
               {
                 text:
-                  t("post.success", {
+                  translate("post.success", {
                     appliedLabelNames: appliedLabelNameString,
                   }) +
                   "\n\n" +
-                  t("post.unlabelInstruction", {
+                  translate("post.unlabelInstruction", {
                     unlabelCommand: `${this.blueskyCommunityBot.commandPrefix}unlabel`,
                   }),
               },
@@ -362,11 +362,11 @@ export class LabelCommand extends Command {
         try {
           // advise on manual verification
           const postRef = await reply.reply({
-            text: t("post.verifiedLabelRequested"),
+            text: translate("post.verifiedLabelRequested"),
           });
 
           await postRef.reply({
-            text: t("post.verificationInstruction", {
+            text: translate("post.verificationInstruction", {
               verificationEmail:
                 this.blueskyCommunityBot.options.labelVerificationEmail,
             }),

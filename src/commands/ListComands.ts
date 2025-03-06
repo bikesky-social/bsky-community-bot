@@ -13,7 +13,7 @@ export class ListCommandsCommand extends Command {
 
   async mention(
     post: Post,
-    t: TFunction<string, undefined>
+    translate: TFunction<string, undefined>
   ): Promise<CommandState.Record> {
     const responsePosts = [];
 
@@ -21,7 +21,7 @@ export class ListCommandsCommand extends Command {
       this.blueskyCommunityBot.commandMap
     );
 
-    let currentPost = t("post.intro") + "\n\n";
+    let currentPost = translate("post.intro") + "\n\n";
 
     for (let i = 0; i < commandKeys.length; i++) {
       const commandKey = commandKeys[i];
@@ -36,7 +36,7 @@ export class ListCommandsCommand extends Command {
         currentPost = currentPost.concat(commandString);
       } else {
         responsePosts.push(currentPost);
-        currentPost = t("post.continued") + "\n\n";
+        currentPost = translate("post.continued") + "\n\n";
       }
     }
 

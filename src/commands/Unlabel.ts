@@ -14,7 +14,7 @@ export class UnlabelCommand extends Command {
 
   async mention(
     post: Post,
-    t: TFunction<string, undefined>
+    translate: TFunction<string, undefined>
   ): Promise<CommandState.Record> {
     const conversationClosedResponse: CommandState.Record = {
       $type: "app.bikesky.communityBot.commandState",
@@ -28,7 +28,7 @@ export class UnlabelCommand extends Command {
       this.blueskyCommunityBot.labelPoliciesKeeper.hasValidSelfServeLabels ===
       false
     ) {
-      await post.reply({ text: t("error.commandNotAvailable") });
+      await post.reply({ text: translate("error.commandNotAvailable") });
       return conversationClosedResponse;
     }
 
@@ -55,11 +55,11 @@ export class UnlabelCommand extends Command {
       }
 
       const postText =
-        t("post.intro") +
+        translate("post.intro") +
         "\n\n" +
         labelListString +
         "\n" +
-        t("post.replyInstructions", { numberList: removeIndexes.join(",") });
+        translate("post.replyInstructions", { numberList: removeIndexes.join(",") });
 
       await post.reply(
         {
@@ -77,7 +77,7 @@ export class UnlabelCommand extends Command {
     } else {
       await post.reply(
         {
-          text: t("error.noLabelsFound", {
+          text: translate("error.noLabelsFound", {
             labelCommand: `${this.blueskyCommunityBot.commandPrefix}label`,
           }),
         },
@@ -91,7 +91,7 @@ export class UnlabelCommand extends Command {
   async reply(
     commandState: CommandState.Record,
     reply: Post,
-    t: TFunction<string, undefined>
+    translate: TFunction<string, undefined>
   ): Promise<CommandState.Record> {
     const conversationClosedResponse: CommandState.Record = {
       $type: "app.bikesky.communityBot.commandState",
@@ -130,25 +130,25 @@ export class UnlabelCommand extends Command {
           if (isNaN(labelIndex)) {
             // invalid response - not a number
             await reply.reply({
-              text: t("error.invalidNumber"),
+              text: translate("error.invalidNumber"),
             });
             return stillWaitingResponse;
           } else if (Number.isInteger(labelIndex) === false) {
             // invalid response - not an integer
             await reply.reply({
-              text: t("error.invalidNumber"),
+              text: translate("error.invalidNumber"),
             });
             return stillWaitingResponse;
           } else if (Number.isSafeInteger(labelIndex) === false) {
             // invalid response - not a safe integer
             await reply.reply({
-              text: t("error.invalidNumber"),
+              text: translate("error.invalidNumber"),
             });
             return stillWaitingResponse;
           } else if (labelIndex < 1 || labelIndex > maxChoice) {
             // invalid response - outside of range
             await reply.reply({
-              text: t("error.invalidChoices"),
+              text: translate("error.invalidChoices"),
             });
             return stillWaitingResponse;
           }
@@ -157,7 +157,7 @@ export class UnlabelCommand extends Command {
         if (indexList.length != uniqueIndeces.length) {
           // invalid response - duplicate choices
           await reply.reply({
-            text: t("error.duplicateChoices"),
+            text: translate("error.duplicateChoices"),
           });
           return stillWaitingResponse;
         }
@@ -199,11 +199,11 @@ export class UnlabelCommand extends Command {
         try {
           // reply that we applied the following labels: xxx
           const postText =
-            t("post.successLine1", {
+            translate("post.successLine1", {
               labelNames: removedLabelNameString,
             }) +
             "\n\n" +
-            t("post.successLine2", {
+            translate("post.successLine2", {
               labelCommand: `${this.blueskyCommunityBot.commandPrefix}label`,
             });
 

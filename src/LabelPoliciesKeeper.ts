@@ -198,8 +198,8 @@ export class LabelPoliciesKeeper {
     const innerMarginVertical = 10;
     const innerMarginHorizontal = 10;
 
-    const t = this.blueskyCommunityBot.getFixedT(locales, "label");
-    payload.labelOptionsAltText = t("post.labelsAltText", {
+    const translate = this.blueskyCommunityBot.getFixedT(locales, "label");
+    payload.labelOptionsAltText = translate("post.labelsAltText", {
       labelerDisplayName:
         this.blueskyCommunityBot.labelerBot.profile.displayName,
     });
