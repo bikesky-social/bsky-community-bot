@@ -4,27 +4,27 @@
     "": {
       "name": "bsky-community-bot",
       "dependencies": {
-        "@atproto/api": "^0.14.7",
-        "@atproto/lexicon": "^0.4.7",
-        "@skyware/bot": "^0.3.8",
-        "@types/opentype.js": "^1.3.8",
-        "canvas": "^3.1.0",
-        "emoji-regex": "^10.4.0",
-        "express": "^4.21.2",
-        "i18next": "^24.2.2",
-        "i18next-fs-backend": "^2.6.0",
-        "node-canvas-text": "^1.0.2",
-        "opentype.js": "^1.3.4",
-        "valid-url": "^1.0.9",
+        "@atproto/api": "latest",
+        "@atproto/lexicon": "latest",
+        "@skyware/bot": "latest",
+        "@types/opentype.js": "latest",
+        "canvas": "latest",
+        "emoji-regex": "latest",
+        "express": "latest",
+        "i18next": "latest",
+        "i18next-fs-backend": "latest",
+        "node-canvas-text": "latest",
+        "opentype.js": "latest",
+        "valid-url": "latest",
       },
       "devDependencies": {
-        "@atproto/lex-cli": "^0.6.1",
-        "@types/bun": "^1.2.4",
-        "@types/express": "^5.0.0",
-        "@types/node-canvas-text": "^1.0.3",
+        "@atproto/lex-cli": "latest",
+        "@types/bun": "latest",
+        "@types/express": "latest",
+        "@types/node-canvas-text": "latest",
       },
       "peerDependencies": {
-        "typescript": "^5.7.3",
+        "typescript": "latest",
       },
     },
   },
@@ -397,7 +397,7 @@
 
     "type-is": ["type-is@1.6.18", "", { "dependencies": { "media-typer": "0.3.0", "mime-types": "~2.1.24" } }, "sha512-TkRKr9sUTxEH8MdfuCSP7VizJyzRNMjj2J2do2Jr3Kym598JVdEksuzPQCnlFPW4ky9Q+iA+ma9BGm06XQBy8g=="],
 
-    "typescript": ["typescript@5.7.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-84MVSjMEHP+FQRPy3pX9sTVV/INIex71s9TL2Gm5FG/WG1SqXeKyZ0k7/blY/4FdOzI12CBy1vGc4og/eus0fw=="],
+    "typescript": ["typescript@5.8.2", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-aJn6wq13/afZp/jT9QZmwEjDqqvSGp1VT5GVg+f/t6/oVyrgXM6BY1h9BRh/O5p3PlUPAe+WuiEZOmb/49RqoQ=="],
 
     "uint8arrays": ["uint8arrays@3.0.0", "", { "dependencies": { "multiformats": "^9.4.2" } }, "sha512-HRCx0q6O9Bfbp+HHSfQQKD7wU70+lydKVt4EghkdOvlK/NlrF90z+eXV34mUd48rNvVJXwkrMSPpCATkct8fJA=="],
 
