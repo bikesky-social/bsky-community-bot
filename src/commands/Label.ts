@@ -38,7 +38,13 @@ export class LabelCommand extends Command {
       this.blueskyCommunityBot.labelPoliciesKeeper.hasValidSelfServeLabels ===
       false
     ) {
-      await post.reply({ text: translate("error.commandNotAvailable") });
+      await post.reply({
+        text: translate("error.commandNotAvailable"),
+        langs: [
+          translate("error.commandNotAvailable", { returnDetails: true })
+            .usedLng,
+        ],
+      });
       return conversationClosedResponse;
     }
 
@@ -55,6 +61,9 @@ export class LabelCommand extends Command {
             maxLabels: this.maxLabels,
             unlabelCommand: `${this.blueskyCommunityBot.commandPrefix}unlabel`,
           }),
+          langs: [
+            translate("error.maxLabels", { returnDetails: true }).usedLng,
+          ],
         },
         { resolveFacets: false }
       );
@@ -147,6 +156,7 @@ export class LabelCommand extends Command {
           alt: imagePayload.labelOptionsAltText,
         },
       ],
+      langs: [translate("post.intro", { returnDetails: true }).usedLng],
     });
 
     return {
@@ -201,24 +211,40 @@ export class LabelCommand extends Command {
             // invalid response - not a number
             await reply.reply({
               text: translate("error.invalidNumber"),
+              langs: [
+                translate("error.invalidNumber", { returnDetails: true })
+                  .usedLng,
+              ],
             });
             return stillWaitingResponse;
           } else if (Number.isInteger(labelIndex) === false) {
             // invalid response - not an integer
             await reply.reply({
               text: translate("error.invalidNumber"),
+              langs: [
+                translate("error.invalidNumber", { returnDetails: true })
+                  .usedLng,
+              ],
             });
             return stillWaitingResponse;
           } else if (Number.isSafeInteger(labelIndex) === false) {
             // invalid response - not a safe integer
             await reply.reply({
               text: translate("error.invalidNumber"),
+              langs: [
+                translate("error.invalidNumber", { returnDetails: true })
+                  .usedLng,
+              ],
             });
             return stillWaitingResponse;
           } else if (labelIndex < 1 || labelIndex > maxChoice) {
             // invalid response - outside of range
             await reply.reply({
               text: translate("error.invalidChoice"),
+              langs: [
+                translate("error.invalidChoice", { returnDetails: true })
+                  .usedLng,
+              ],
             });
             return stillWaitingResponse;
           } else {
@@ -238,6 +264,10 @@ export class LabelCommand extends Command {
                         reply.langs ? reply.langs : []
                       ),
                   }),
+                  langs: [
+                    translate("error.duplicateLabel", { returnDetails: true })
+                      .usedLng,
+                  ],
                 });
                 return stillWaitingResponse;
               }
@@ -251,6 +281,10 @@ export class LabelCommand extends Command {
             text: translate("error.addingTooManyLabels", {
               maxLabels: this.maxLabels,
             }),
+            langs: [
+              translate("error.addingTooManyLabels", { returnDetails: true })
+                .usedLng,
+            ],
           });
           return stillWaitingResponse;
         }
@@ -259,6 +293,10 @@ export class LabelCommand extends Command {
           // invalid response - not all unique choices
           await reply.reply({
             text: translate("error.duplicateChoices"),
+            langs: [
+              translate("error.duplicateChoices", { returnDetails: true })
+                .usedLng,
+            ],
           });
           return stillWaitingResponse;
         }
@@ -326,6 +364,9 @@ export class LabelCommand extends Command {
                   }) +
                   "\n\n" +
                   translate("post.verifiedLabelRequested"),
+                langs: [
+                  translate("post.success", { returnDetails: true }).usedLng,
+                ],
               },
               { splitLongPost: true, resolveFacets: false }
             );
@@ -335,6 +376,11 @@ export class LabelCommand extends Command {
                 verificationEmail:
                   this.blueskyCommunityBot.options.labelVerificationEmail,
               }),
+              langs: [
+                translate("post.verificationInstruction", {
+                  returnDetails: true,
+                }).usedLng,
+              ],
             });
           } else {
             // reply that we applied the following labels: xxx
@@ -348,6 +394,9 @@ export class LabelCommand extends Command {
                   translate("post.unlabelInstruction", {
                     unlabelCommand: `${this.blueskyCommunityBot.commandPrefix}unlabel`,
                   }),
+                langs: [
+                  translate("post.success", { returnDetails: true }).usedLng,
+                ],
               },
               { splitLongPost: true, resolveFacets: false }
             );
@@ -363,6 +412,10 @@ export class LabelCommand extends Command {
           // advise on manual verification
           const postRef = await reply.reply({
             text: translate("post.verifiedLabelRequested"),
+            langs: [
+              translate("post.verifiedLabelRequested", { returnDetails: true })
+                .usedLng,
+            ],
           });
 
           await postRef.reply({
@@ -370,6 +423,10 @@ export class LabelCommand extends Command {
               verificationEmail:
                 this.blueskyCommunityBot.options.labelVerificationEmail,
             }),
+            langs: [
+              translate("post.verificationInstruction", { returnDetails: true })
+                .usedLng,
+            ],
           });
         } catch (error) {
           console.log(

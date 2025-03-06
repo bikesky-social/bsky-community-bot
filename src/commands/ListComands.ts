@@ -17,16 +17,13 @@ export class ListCommandsCommand extends Command {
   ): Promise<CommandState.Record> {
     const responsePosts = [];
 
-    const commandKeys = Object.keys(
-      this.blueskyCommunityBot.commandMap
-    );
+    const commandKeys = Object.keys(this.blueskyCommunityBot.commandMap);
 
     let currentPost = translate("post.intro") + "\n\n";
 
     for (let i = 0; i < commandKeys.length; i++) {
       const commandKey = commandKeys[i];
-      const command =
-        this.blueskyCommunityBot.commandMap[commandKey];
+      const command = this.blueskyCommunityBot.commandMap[commandKey];
       const commandString = `${this.blueskyCommunityBot.commandPrefix}${command.commandName}\n`;
 
       if (
@@ -46,7 +43,13 @@ export class ListCommandsCommand extends Command {
 
     for (let i = 0; i < responsePosts.length; i++) {
       const postText = responsePosts[i];
-      thread = await thread.reply({ text: postText }, { resolveFacets: false });
+      thread = await thread.reply(
+        {
+          text: postText,
+          langs: [translate("post.intro", { returnDetails: true }).usedLng],
+        },
+        { resolveFacets: false }
+      );
     }
 
     return {

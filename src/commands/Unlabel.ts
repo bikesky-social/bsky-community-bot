@@ -28,7 +28,13 @@ export class UnlabelCommand extends Command {
       this.blueskyCommunityBot.labelPoliciesKeeper.hasValidSelfServeLabels ===
       false
     ) {
-      await post.reply({ text: translate("error.commandNotAvailable") });
+      await post.reply({
+        text: translate("error.commandNotAvailable"),
+        langs: [
+          translate("error.commandNotAvailable", { returnDetails: true })
+            .usedLng,
+        ],
+      });
       return conversationClosedResponse;
     }
 
@@ -59,11 +65,14 @@ export class UnlabelCommand extends Command {
         "\n\n" +
         labelListString +
         "\n" +
-        translate("post.replyInstructions", { numberList: removeIndexes.join(",") });
+        translate("post.replyInstructions", {
+          numberList: removeIndexes.join(","),
+        });
 
       await post.reply(
         {
           text: postText,
+          langs: [translate("post.intro", { returnDetails: true }).usedLng],
         },
         { splitLongPost: true }
       );
@@ -80,6 +89,9 @@ export class UnlabelCommand extends Command {
           text: translate("error.noLabelsFound", {
             labelCommand: `${this.blueskyCommunityBot.commandPrefix}label`,
           }),
+          langs: [
+            translate("error.noLabelsFound", { returnDetails: true }).usedLng,
+          ],
         },
         { resolveFacets: false }
       );
@@ -131,24 +143,40 @@ export class UnlabelCommand extends Command {
             // invalid response - not a number
             await reply.reply({
               text: translate("error.invalidNumber"),
+              langs: [
+                translate("error.invalidNumber", { returnDetails: true })
+                  .usedLng,
+              ],
             });
             return stillWaitingResponse;
           } else if (Number.isInteger(labelIndex) === false) {
             // invalid response - not an integer
             await reply.reply({
               text: translate("error.invalidNumber"),
+              langs: [
+                translate("error.invalidNumber", { returnDetails: true })
+                  .usedLng,
+              ],
             });
             return stillWaitingResponse;
           } else if (Number.isSafeInteger(labelIndex) === false) {
             // invalid response - not a safe integer
             await reply.reply({
               text: translate("error.invalidNumber"),
+              langs: [
+                translate("error.invalidNumber", { returnDetails: true })
+                  .usedLng,
+              ],
             });
             return stillWaitingResponse;
           } else if (labelIndex < 1 || labelIndex > maxChoice) {
             // invalid response - outside of range
             await reply.reply({
               text: translate("error.invalidChoices"),
+              langs: [
+                translate("error.invalidChoices", { returnDetails: true })
+                  .usedLng,
+              ],
             });
             return stillWaitingResponse;
           }
@@ -158,6 +186,10 @@ export class UnlabelCommand extends Command {
           // invalid response - duplicate choices
           await reply.reply({
             text: translate("error.duplicateChoices"),
+            langs: [
+              translate("error.duplicateChoices", { returnDetails: true })
+                .usedLng,
+            ],
           });
           return stillWaitingResponse;
         }
@@ -210,6 +242,9 @@ export class UnlabelCommand extends Command {
           await reply.reply(
             {
               text: postText,
+              langs: [
+                translate("post.successLine1", { returnDetails: true }).usedLng,
+              ],
             },
             { splitLongPost: true, resolveFacets: false }
           );
