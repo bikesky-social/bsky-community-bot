@@ -1,28 +1,50 @@
 import { Command } from "./Command";
-import { Post } from "@skyware/bot";
-import * as CommandState from "../lexicon/types/app/bikesky/communityBot/commandState";
+import { Post, PostReference } from "@skyware/bot";
 import type { TFunction } from "i18next";
 
-enum UnlabelCommandStates {
-  Closed,
-  WaitingForUnlabelChoices,
-}
+import * as CommandPrompt from "../lexicon/types/app/bikesky/communityBot/commandPrompt";
+import * as UnlabelDefs from "../lexicon/types/app/bikesky/communityBot/unlabelDefs";
+import * as BskyCommunityBotLexicons from "../lexicon/lexicons";
+import { type $Typed } from "../lexicon/util";
+const arrayEqual = require("array-equal");
 
 export class UnlabelCommand extends Command {
   commandName = "unlabel";
   commandDescription = "remove labels from your account";
 
-  async mention(
-    post: Post,
-    translate: TFunction<string, undefined>
-  ): Promise<CommandState.Record> {
-    const conversationClosedResponse: CommandState.Record = {
-      $type: "app.bikesky.communityBot.commandState",
-      command: this.commandName,
-      authorDid: post.author.did,
-      state: UnlabelCommandStates.Closed,
+  async createUnlabelPromptRecord(
+    post: PostReference,
+    authorDid: string,
+    labelIdentifiers: string[]
+  ): Promise<$Typed<CommandPrompt.Record>> {
+    const rule: $Typed<CommandPrompt.DidListRule> = {
+      $type: "app.bikesky.communityBot.commandPrompt#didListRule",
+      list: [authorDid],
     };
 
+    const unlabelPrompt: $Typed<UnlabelDefs.UnlabelPrompt> = {
+      $type: "app.bikesky.communityBot.unlabelDefs#unlabelPrompt",
+      labelIdentifiers: labelIdentifiers,
+    };
+
+    const commandPrompt: $Typed<CommandPrompt.Record> = {
+      $type: BskyCommunityBotLexicons.ids.AppBikeskyCommunityBotCommandPrompt,
+      post: post.uri,
+      command: this.commandName,
+      prompt: unlabelPrompt,
+      allow: [rule],
+    };
+
+    await this.putPromptRecord(commandPrompt);
+
+    return commandPrompt;
+  }
+
+  async mention(
+    post: Post,
+    translate: TFunction<string, undefined>,
+    authorDid: string
+  ) {
     // check if command is available
     if (
       this.blueskyCommunityBot.labelPoliciesKeeper.hasValidSelfServeLabels ===
@@ -35,12 +57,12 @@ export class UnlabelCommand extends Command {
             .usedLng,
         ],
       });
-      return conversationClosedResponse;
+      return;
     }
 
     const selfServeLabels =
       await this.blueskyCommunityBot.labelPoliciesKeeper.getTargetSelfServeLabels(
-        post.author.did
+        authorDid
       );
 
     // check if author has zero labels
@@ -69,7 +91,7 @@ export class UnlabelCommand extends Command {
           numberList: removeIndexes.join(","),
         });
 
-      await post.reply(
+      const replyRef = await post.reply(
         {
           text: postText,
           langs: [translate("post.intro", { returnDetails: true }).usedLng],
@@ -77,12 +99,11 @@ export class UnlabelCommand extends Command {
         { splitLongPost: true }
       );
 
-      return {
-        $type: "app.bikesky.communityBot.commandState",
-        command: this.commandName,
-        authorDid: post.author.did,
-        state: UnlabelCommandStates.WaitingForUnlabelChoices,
-      };
+      await this.createUnlabelPromptRecord(
+        replyRef,
+        authorDid,
+        selfServeLabels.map((label) => label.val)
+      );
     } else {
       await post.reply(
         {
@@ -95,38 +116,46 @@ export class UnlabelCommand extends Command {
         },
         { resolveFacets: false }
       );
-
-      return conversationClosedResponse;
     }
   }
 
   async reply(
-    commandState: CommandState.Record,
+    commandPrompt: CommandPrompt.Record,
     reply: Post,
     translate: TFunction<string, undefined>
-  ): Promise<CommandState.Record> {
-    const conversationClosedResponse: CommandState.Record = {
-      $type: "app.bikesky.communityBot.commandState",
-      command: this.commandName,
-      authorDid: reply.author.did,
-      state: UnlabelCommandStates.Closed,
-    };
-
-    if (commandState.state === UnlabelCommandStates.WaitingForUnlabelChoices) {
-      const stillWaitingResponse: CommandState.Record = {
-        $type: "app.bikesky.communityBot.commandState",
-        command: this.commandName,
-        authorDid: reply.author.did,
-        state: UnlabelCommandStates.WaitingForUnlabelChoices,
-      };
-
+  ) {
+    if (UnlabelDefs.isUnlabelPrompt(commandPrompt.prompt)) {
+      const unlabelPrompt: UnlabelDefs.UnlabelPrompt = commandPrompt.prompt;
       const selfServeLabels =
         await this.blueskyCommunityBot.labelPoliciesKeeper.getTargetSelfServeLabels(
           reply.author.did
         );
 
-      const maxChoice = selfServeLabels.length;
+      const selfServeLabelIdentifiers = selfServeLabels.map(
+        (label) => label.val
+      );
 
+      if (
+        arrayEqual(
+          selfServeLabelIdentifiers,
+          unlabelPrompt.labelIdentifiers
+        ) === false
+      ) {
+        const replyRef = await reply.reply({
+          text: translate("error.labelsOutOfSync"),
+          langs: [
+            translate("labelsOutOfSync", { returnDetails: true }).usedLng,
+          ],
+        });
+
+        await this.mention(await replyRef.fetch(), translate, reply.author.did);
+
+        return;
+      }
+
+      const maxChoice = unlabelPrompt.labelIdentifiers.length;
+
+      // parse the reply as if it is a comma-separated list of numbers
       const indexList: number[] = [];
       reply.text
         .replace(/\s/g, "")
@@ -141,57 +170,57 @@ export class UnlabelCommand extends Command {
           const labelIndex = indexList[i];
           if (isNaN(labelIndex)) {
             // invalid response - not a number
-            await reply.reply({
+            await this.replyWithUpdatedPrompt(reply, commandPrompt, {
               text: translate("error.invalidNumber"),
               langs: [
                 translate("error.invalidNumber", { returnDetails: true })
                   .usedLng,
               ],
             });
-            return stillWaitingResponse;
+            return;
           } else if (Number.isInteger(labelIndex) === false) {
             // invalid response - not an integer
-            await reply.reply({
+            await this.replyWithUpdatedPrompt(reply, commandPrompt, {
               text: translate("error.invalidNumber"),
               langs: [
                 translate("error.invalidNumber", { returnDetails: true })
                   .usedLng,
               ],
             });
-            return stillWaitingResponse;
+            return;
           } else if (Number.isSafeInteger(labelIndex) === false) {
             // invalid response - not a safe integer
-            await reply.reply({
+            await this.replyWithUpdatedPrompt(reply, commandPrompt, {
               text: translate("error.invalidNumber"),
               langs: [
                 translate("error.invalidNumber", { returnDetails: true })
                   .usedLng,
               ],
             });
-            return stillWaitingResponse;
+            return;
           } else if (labelIndex < 1 || labelIndex > maxChoice) {
             // invalid response - outside of range
-            await reply.reply({
+            await this.replyWithUpdatedPrompt(reply, commandPrompt, {
               text: translate("error.invalidChoices"),
               langs: [
                 translate("error.invalidChoices", { returnDetails: true })
                   .usedLng,
               ],
             });
-            return stillWaitingResponse;
+            return;
           }
         }
 
         if (indexList.length != uniqueIndeces.length) {
           // invalid response - duplicate choices
-          await reply.reply({
+          await this.replyWithUpdatedPrompt(reply, commandPrompt, {
             text: translate("error.duplicateChoices"),
             langs: [
               translate("error.duplicateChoices", { returnDetails: true })
                 .usedLng,
             ],
           });
-          return stillWaitingResponse;
+          return;
         }
       } catch (error) {
         console.log(
@@ -199,7 +228,7 @@ export class UnlabelCommand extends Command {
             error
           )}`
         );
-        return stillWaitingResponse;
+        return;
       }
 
       const labelsToRemove = [];
@@ -252,11 +281,8 @@ export class UnlabelCommand extends Command {
           console.log(
             `unable to respond about removing labels: ${JSON.stringify(error)}`
           );
-          return conversationClosedResponse;
         }
       }
     }
-
-    return conversationClosedResponse;
   }
 }

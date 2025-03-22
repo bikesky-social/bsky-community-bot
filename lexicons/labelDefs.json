@@ -1,0 +1,23 @@
+{
+  "lexicon": 1,
+  "id": "app.bikesky.communityBot.labelDefs",
+  "description": "Command prompts for the label command.",
+  "defs": {
+    "labelPrompt": {
+      "type": "object",
+      "required": ["labelIdentifiers"],
+      "properties": {
+        "labelIdentifiers": {
+          "type": "array",
+          "description": "A list of label identifiers that are being offered to the actor that executed the command.",
+          "items": { "type": "string" }
+        },
+        "verifiedLabelIdentifiers": {
+          "type": "array",
+          "description": "A list of label identifiers that are being offered to the actor that executed the command which require additional verification.",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

@@ -10,6 +10,7 @@
     "noLabelsFound": "Your account does not have any of our labels on it. If you want to add some, send me a post that says: {{labelCommand}}",
     "invalidNumber": "Not all of these choices are valid numbers. Can you please try again?",
     "invalidChoices": "Not all of these choices are valid. Can you please try again?",
-    "duplicateChoices": "Not all of these choices are unique. Can you please try again?"
+    "duplicateChoices": "Not all of these choices are unique. Can you please try again?",
+    "labelsOutOfSync": "The labels on your account have changed, so I'm going to create a new post for this. Can you please reply to this one instead:"
   }
 }

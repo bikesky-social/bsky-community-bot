@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "app.bikesky.communityBot.commandPrompt",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "description": "Record describing a command prompt associated with a post which can be replied to in order to advance the command. The commandPrompt record's record key (rkey) must match the record key of the post that it belongs to.",
+      "record": {
+        "type": "object",
+        "required": ["post", "command", "prompt"],
+        "properties": {
+          "post": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "Reference (AT-URI) to the post record."
+          },
+          "allow": {
+            "type": "array",
+            "description": "List of rules defining who can respond to the prompt. If value is an empty array, no one can respond. If value is undefined, anyone can respond.",
+            "items": {
+              "type": "union",
+              "refs": ["#didListRule"]
+            }
+          },
+          "command": {
+            "type": "string",
+            "description": "A token that indicates which command should handle the response to the prompt."
+          },
+          "prompt": {
+            "type": "union",
+            "description": "An object that stores data that the prompt needs when an actor responds to it.",
+            "refs": [
+              "app.bikesky.communityBot.labelPrompts#labelPrompt",
+              "app.bikesky.communityBot.unlabelPrompts#unlabelOffer"
+            ]
+          }
+        }
+      }
+    },
+    "didListRule": {
+      "type": "object",
+      "description": "Allow a list of actors to respond to the prompt, indicated by a list of dids.",
+      "required": ["list"],
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "did"
+          }
+        }
+      }
+    }
+  }
+}

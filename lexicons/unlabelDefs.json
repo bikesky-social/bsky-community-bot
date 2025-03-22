@@ -1,0 +1,18 @@
+{
+  "lexicon": 1,
+  "id": "app.bikesky.communityBot.unlabelDefs",
+  "description": "Command prompts for the unlabel command.",
+  "defs": {
+    "unlabelPrompt": {
+      "type": "object",
+      "required": ["labelIdentifiers"],
+      "properties": {
+        "labelIdentifiers": {
+          "type": "array",
+          "description": "A list of identifiers for labels that appear on the actor that executed the command.",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

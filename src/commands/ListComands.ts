@@ -1,11 +1,6 @@
 import { Command } from "./Command";
 import { Post, PostReference } from "@skyware/bot";
-import * as CommandState from "../lexicon/types/app/bikesky/communityBot/commandState";
 import type { TFunction } from "i18next";
-
-enum ListCommandsCommandStates {
-  Closed,
-}
 
 export class ListCommandsCommand extends Command {
   commandName = "listcommands";
@@ -13,8 +8,9 @@ export class ListCommandsCommand extends Command {
 
   async mention(
     post: Post,
-    translate: TFunction<string, undefined>
-  ): Promise<CommandState.Record> {
+    translate: TFunction<string, undefined>,
+    authorDid: string
+  ) {
     const responsePosts = [];
 
     const commandKeys = Object.keys(this.blueskyCommunityBot.commandMap);
@@ -51,12 +47,5 @@ export class ListCommandsCommand extends Command {
         { resolveFacets: false }
       );
     }
-
-    return {
-      $type: "app.bikesky.communityBot.commandState",
-      command: this.commandName,
-      authorDid: post.author.did,
-      state: ListCommandsCommandStates.Closed,
-    };
   }
 }

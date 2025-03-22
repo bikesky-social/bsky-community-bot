@@ -16,6 +16,7 @@
     "invalidChoice": "Not all of these choices are valid. Can you please try again?",
     "duplicateLabel":"You already have one of these labels ({{labelName}}). Can you please try again?",
     "addingTooManyLabels":"Adding this many labels would exceed the maximum that we allow on accounts ({{maxLabels}}). Can you please try again?",
-    "duplicateChoices":"Not all of these choices are unique. Can you please try again?"
+    "duplicateChoices":"Not all of these choices are unique. Can you please try again?",
+    "labelsOutOfSync":"The labels we offer have changed, so I'm going to create a new post for this. Can you please reply to this one instead:"
   }
 }

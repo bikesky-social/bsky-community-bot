@@ -1,13 +1,13 @@
 import { Command } from "./Command";
-import { Post } from "@skyware/bot";
-import * as CommandState from "../lexicon/types/app/bikesky/communityBot/commandState";
+import { Post, PostReference } from "@skyware/bot";
 import { BlueskyCommunityBot } from "../BlueskyCommunityBot";
 import type { TFunction } from "i18next";
 
-enum LabelCommandStates {
-  Closed,
-  WaitingForLabelChoices,
-}
+import * as CommandPrompt from "../lexicon/types/app/bikesky/communityBot/commandPrompt";
+import * as LabelDefs from "../lexicon/types/app/bikesky/communityBot/labelDefs";
+import { type $Typed } from "../lexicon/util";
+import * as BskyCommunityBotLexicons from "../lexicon/lexicons";
+const arrayEqual = require("array-equal");
 
 export class LabelCommand extends Command {
   commandName = "label";
@@ -22,17 +22,34 @@ export class LabelCommand extends Command {
         : this.blueskyCommunityBot.options.maxLabels;
   }
 
-  async mention(
-    post: Post,
-    translate: TFunction<string, undefined>
-  ): Promise<CommandState.Record> {
-    const conversationClosedResponse: CommandState.Record = {
-      $type: "app.bikesky.communityBot.commandState",
-      command: this.commandName,
-      authorDid: post.author.did,
-      state: LabelCommandStates.Closed,
+  async createLabelPromptRecord(
+    post: PostReference,
+    labelIdentifiers: string[],
+    verifiedLabelIdentifiers: string[]
+  ): Promise<$Typed<CommandPrompt.Record>> {
+    const labelPrompt: $Typed<LabelDefs.LabelPrompt> = {
+      $type: "app.bikesky.communityBot.labelDefs#labelPrompt",
+      labelIdentifiers: labelIdentifiers,
+      verifiedLabelIdentifiers: verifiedLabelIdentifiers,
     };
 
+    const commandPrompt: $Typed<CommandPrompt.Record> = {
+      $type: BskyCommunityBotLexicons.ids.AppBikeskyCommunityBotCommandPrompt,
+      post: post.uri,
+      command: this.commandName,
+      prompt: labelPrompt,
+    };
+
+    await this.putPromptRecord(commandPrompt);
+
+    return commandPrompt;
+  }
+
+  async mention(
+    post: Post,
+    translate: TFunction<string, undefined>,
+    authorDid: string
+  ) {
     // check if command is available
     if (
       this.blueskyCommunityBot.labelPoliciesKeeper.hasValidSelfServeLabels ===
@@ -45,12 +62,12 @@ export class LabelCommand extends Command {
             .usedLng,
         ],
       });
-      return conversationClosedResponse;
+      return;
     }
 
     const selfServeLabels =
       await this.blueskyCommunityBot.labelPoliciesKeeper.getTargetSelfServeLabels(
-        post.author.did
+        authorDid
       );
 
     // check if max labels would be exceeded
@@ -67,7 +84,7 @@ export class LabelCommand extends Command {
         },
         { resolveFacets: false }
       );
-      return conversationClosedResponse;
+      return;
     }
 
     // calculate the length of the post without examples populated
@@ -144,7 +161,7 @@ export class LabelCommand extends Command {
       );
 
     // post
-    await post.reply({
+    const replyRef = await post.reply({
       text: postText,
       images: [
         {
@@ -159,38 +176,47 @@ export class LabelCommand extends Command {
       langs: [translate("post.intro", { returnDetails: true }).usedLng],
     });
 
-    return {
-      $type: "app.bikesky.communityBot.commandState",
-      command: this.commandName,
-      authorDid: post.author.did,
-      state: LabelCommandStates.WaitingForLabelChoices,
-    };
+    // save the command prompt record
+    await this.createLabelPromptRecord(
+      replyRef,
+      this.blueskyCommunityBot.options.selfServeLabelIdentifiers,
+      this.blueskyCommunityBot.options.verifiedLabels
+    );
   }
 
   async reply(
-    commandState: CommandState.Record,
+    commandPrompt: CommandPrompt.Record,
     reply: Post,
     translate: TFunction<string, undefined>
-  ): Promise<CommandState.Record> {
-    const conversationClosedResponse: CommandState.Record = {
-      $type: "app.bikesky.communityBot.commandState",
-      command: this.commandName,
-      authorDid: reply.author.did,
-      state: LabelCommandStates.Closed,
-    };
-
-    if (commandState.state === LabelCommandStates.WaitingForLabelChoices) {
-      const stillWaitingResponse: CommandState.Record = {
-        $type: "app.bikesky.communityBot.commandState",
-        command: this.commandName,
-        authorDid: reply.author.did,
-        state: LabelCommandStates.WaitingForLabelChoices,
-      };
-
+  ) {
+    if (LabelDefs.isLabelPrompt(commandPrompt.prompt)) {
+      const labelPrompt: LabelDefs.LabelPrompt = commandPrompt.prompt;
       const selfServeLabels =
         await this.blueskyCommunityBot.labelPoliciesKeeper.getTargetSelfServeLabels(
           reply.author.did
         );
+
+      if (
+        arrayEqual(
+          this.blueskyCommunityBot.options.selfServeLabelIdentifiers,
+          labelPrompt.labelIdentifiers
+        ) === false ||
+        arrayEqual(
+          this.blueskyCommunityBot.options.verifiedLabels,
+          labelPrompt.verifiedLabelIdentifiers
+        ) === false
+      ) {
+        const replyRef = await reply.reply({
+          text: translate("error.labelsOutOfSync"),
+          langs: [
+            translate("labelsOutOfSync", { returnDetails: true }).usedLng,
+          ],
+        });
+
+        await this.mention(await replyRef.fetch(), translate, reply.author.did);
+
+        return;
+      }
 
       const maxChoice =
         this.blueskyCommunityBot.options.selfServeLabelIdentifiers.length;
@@ -209,44 +235,44 @@ export class LabelCommand extends Command {
           const labelIndex = indexList[i];
           if (isNaN(labelIndex)) {
             // invalid response - not a number
-            await reply.reply({
+            await this.replyWithUpdatedPrompt(reply, commandPrompt, {
               text: translate("error.invalidNumber"),
               langs: [
                 translate("error.invalidNumber", { returnDetails: true })
                   .usedLng,
               ],
             });
-            return stillWaitingResponse;
+            return;
           } else if (Number.isInteger(labelIndex) === false) {
             // invalid response - not an integer
-            await reply.reply({
+            await this.replyWithUpdatedPrompt(reply, commandPrompt, {
               text: translate("error.invalidNumber"),
               langs: [
                 translate("error.invalidNumber", { returnDetails: true })
                   .usedLng,
               ],
             });
-            return stillWaitingResponse;
+            return;
           } else if (Number.isSafeInteger(labelIndex) === false) {
             // invalid response - not a safe integer
-            await reply.reply({
+            await this.replyWithUpdatedPrompt(reply, commandPrompt, {
               text: translate("error.invalidNumber"),
               langs: [
                 translate("error.invalidNumber", { returnDetails: true })
                   .usedLng,
               ],
             });
-            return stillWaitingResponse;
+            return;
           } else if (labelIndex < 1 || labelIndex > maxChoice) {
             // invalid response - outside of range
-            await reply.reply({
+            await this.replyWithUpdatedPrompt(reply, commandPrompt, {
               text: translate("error.invalidChoice"),
               langs: [
                 translate("error.invalidChoice", { returnDetails: true })
                   .usedLng,
               ],
             });
-            return stillWaitingResponse;
+            return;
           } else {
             for (let j = 0; j < selfServeLabels.length; j++) {
               const selfServeLabelIdentifier = selfServeLabels[j].val;
@@ -256,7 +282,7 @@ export class LabelCommand extends Command {
                 ] === selfServeLabelIdentifier
               ) {
                 // invalid response - they already have this label
-                await reply.reply({
+                await this.replyWithUpdatedPrompt(reply, commandPrompt, {
                   text: translate("error.duplicateLabel", {
                     labelName:
                       this.blueskyCommunityBot.labelPoliciesKeeper.getLabelName(
@@ -269,7 +295,7 @@ export class LabelCommand extends Command {
                       .usedLng,
                   ],
                 });
-                return stillWaitingResponse;
+                return;
               }
             }
           }
@@ -277,7 +303,7 @@ export class LabelCommand extends Command {
 
         if (indexList.length + selfServeLabels.length > this.maxLabels) {
           // invalid response - this would result in too many labels
-          await reply.reply({
+          await this.replyWithUpdatedPrompt(reply, commandPrompt, {
             text: translate("error.addingTooManyLabels", {
               maxLabels: this.maxLabels,
             }),
@@ -286,19 +312,19 @@ export class LabelCommand extends Command {
                 .usedLng,
             ],
           });
-          return stillWaitingResponse;
+          return;
         }
 
         if (indexList.length != uniqueIndeces.length) {
           // invalid response - not all unique choices
-          await reply.reply({
+          await this.replyWithUpdatedPrompt(reply, commandPrompt, {
             text: translate("error.duplicateChoices"),
             langs: [
               translate("error.duplicateChoices", { returnDetails: true })
                 .usedLng,
             ],
           });
-          return stillWaitingResponse;
+          return;
         }
       } catch (error) {
         console.log(
@@ -306,7 +332,7 @@ export class LabelCommand extends Command {
             error
           )}`
         );
-        return stillWaitingResponse;
+        return;
       }
 
       const labelsToApply = [];
@@ -405,7 +431,7 @@ export class LabelCommand extends Command {
           console.log(
             `unable to respond about applying labels: ${JSON.stringify(error)}`
           );
-          return conversationClosedResponse;
+          return;
         }
       } else if (labelsAwaitingVerification.length > 0) {
         try {
@@ -432,11 +458,8 @@ export class LabelCommand extends Command {
           console.log(
             `unable to respond about verified labels: ${JSON.stringify(error)}`
           );
-          return conversationClosedResponse;
         }
       }
     }
-
-    return conversationClosedResponse;
   }
 }

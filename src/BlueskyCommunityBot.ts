@@ -1,8 +1,8 @@
 import { Bot, EventStrategy, Post } from "@skyware/bot";
 import { Command } from "./commands/Command";
 import express from "express";
-import * as CommandState from "./lexicon/types/app/bikesky/communityBot/commandState";
-import { CommandStates } from "./commands/Command";
+import * as CommandPrompt from "./lexicon/types/app/bikesky/communityBot/commandPrompt";
+
 import { LabelPoliciesKeeper } from "./LabelPoliciesKeeper";
 import i18n from "i18next";
 import Backend from "i18next-fs-backend";
@@ -160,28 +160,14 @@ export class BlueskyCommunityBot {
         );
 
         const t = this.getFixedT(post.langs ? post.langs : [], cmd.commandName);
-        const commandResult = await cmd.mention(post, t);
-        if (commandResult.state != CommandStates.Closed) {
-          const commandRecordKey = this.getCommandRecordKeyFromPost(post);
-          try {
-            const stateSavingResponse = await this.chatBot.putRecord(
-              BskyCommunityBotLexicons.ids.AppBikeskyCommunityBotCommandState,
-              commandResult,
-              commandRecordKey
-            );
-          } catch (error) {
-            console.log(
-              `failed to save conversation state: ${JSON.stringify(error)}`
-            );
-          }
-        }
+        await cmd.mention(post, t, post.author.did);
       }
     });
 
     this.chatBot.on("reply", async (reply) => {
-      if (reply.replyRef?.root.cid) {
-        const commandRecordKey = this.getCommandRecordKeyFromPost(reply);
+      if (reply.replyRef?.parent.uri) {
         try {
+          const rkey = reply.replyRef.parent.uri.split("/").pop() as string;
           const record = await this.chatBot.agent.get(
             "com.atproto.repo.getRecord",
             {
@@ -189,8 +175,8 @@ export class BlueskyCommunityBot {
                 repo: this.chatBot.profile.did,
                 collection:
                   BskyCommunityBotLexicons.ids
-                    .AppBikeskyCommunityBotCommandState,
-                rkey: commandRecordKey,
+                    .AppBikeskyCommunityBotCommandPrompt,
+                rkey: rkey,
               },
             }
           );
@@ -198,13 +184,29 @@ export class BlueskyCommunityBot {
           const recordValue = record.data.value;
 
           if (
-            CommandState.isRecord(recordValue) &&
-            CommandState.validateRecord(recordValue).success
+            CommandPrompt.isRecord(recordValue) &&
+            CommandPrompt.validateRecord(recordValue).success
           ) {
-            const commandState = recordValue as CommandState.Record;
+            const commandPrompt = recordValue as CommandPrompt.Record;
 
-            if (commandState.authorDid === reply.author.did) {
-              const cmd = this.commandMap[commandState.command];
+            let allow = true;
+
+            if (commandPrompt.allow) {
+              for (let i = 0; i < commandPrompt.allow.length; i++) {
+                const rule = commandPrompt.allow[i];
+
+                if (CommandPrompt.isDidListRule(rule)) {
+                  if (rule.list.includes(reply.author.did) === false) {
+                    allow = false;
+
+                    // TODO: reply saying they aren't allowed to reply?
+                  }
+                }
+              }
+            }
+
+            if (allow) {
+              const cmd = this.commandMap[commandPrompt.command];
               if (cmd) {
                 console.log(
                   `[reply] command received from ${reply.author.did}: ${reply.text} (${reply.uri})`
@@ -212,45 +214,17 @@ export class BlueskyCommunityBot {
 
                 const t = this.getFixedT(
                   reply.langs ? reply.langs : [],
-                  commandState.command
+                  commandPrompt.command
                 );
-                const commandResult = await cmd.reply(commandState, reply, t);
-
-                if (commandResult.state === CommandStates.Closed) {
-                  try {
-                    const recordAtUri = `at://${this.chatBot.profile.did}/${BskyCommunityBotLexicons.ids.AppBikeskyCommunityBotCommandState}/${commandRecordKey}`;
-                    await this.chatBot.deleteRecord(recordAtUri);
-                  } catch (error) {
-                    console.log(
-                      `failed to delete conversation state: ${JSON.stringify(
-                        error
-                      )}`
-                    );
-                  }
-                } else {
-                  try {
-                    const stateSavingResponse = await this.chatBot.putRecord(
-                      BskyCommunityBotLexicons.ids
-                        .AppBikeskyCommunityBotCommandState,
-                      commandResult,
-                      commandRecordKey
-                    );
-                  } catch (error) {
-                    console.log(
-                      `failed to save conversation state: ${JSON.stringify(
-                        error
-                      )}`
-                    );
-                  }
-                }
+                const commandResult = await cmd.reply(commandPrompt, reply, t);
               }
             }
           }
         } catch (error) {
-          console.log(`failed to fetch commandState: ${JSON.stringify(error)}`);
+          console.log(
+            `failed to fetch command prompt: ${JSON.stringify(error)}`
+          );
         }
-      } else {
-        console.log("reply has no root: " + JSON.stringify(reply));
       }
     });
 
