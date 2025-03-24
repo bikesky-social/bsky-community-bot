@@ -70,6 +70,7 @@
     "i18next-fs-backend": "^2.6.0",
     "node-canvas-text": "^1.0.2",
     "opentype.js": "^1.3.4",
+    "playwright": "^1.51.1",
     "valid-url": "^1.0.9"
   }
 }

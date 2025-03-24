@@ -8,6 +8,7 @@ import { Canvas, loadImage } from "canvas";
 import opentype from "opentype.js";
 import drawText from "node-canvas-text";
 import emojiRegex from "emoji-regex";
+import { chromium, firefox, webkit } from "playwright";
 
 type LabelOptionsImagePayload = {
   labelOptionsCanvas: Canvas;
@@ -39,6 +40,11 @@ export class LabelPoliciesKeeper {
     this.blueskyCommunityBot.server.get(
       "/get-label-image",
       this.getLabelImageRoute.bind(this)
+    );
+
+    this.blueskyCommunityBot.server.get(
+      "/get-url-screenshot",
+      this.getUrlScreenshot.bind(this)
     );
 
     await this.updateLabelPolicies();
@@ -139,8 +145,7 @@ export class LabelPoliciesKeeper {
         }
 
         return true;
-      }
-      else {
+      } else {
         console.log("returned labeler view was not detailed");
       }
 
@@ -407,6 +412,20 @@ export class LabelPoliciesKeeper {
     ] = payload;
 
     return payload;
+  }
+
+  async getUrlScreenshot(req: Request, res: Response) {
+    const browser = await chromium.launch(); // Or 'firefox' or 'webkit'.
+    const page = await browser.newPage({deviceScaleFactor:2});
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    
+    await page.goto("http://localhost:3005/get-label-image");
+
+    const buffer = await page.screenshot({ type: "png", scale:"device" });
+    await browser.close();
+
+    res.type("png");
+    res.end(buffer);
   }
 
   async getLabelImageRoute(req: Request, res: Response) {
