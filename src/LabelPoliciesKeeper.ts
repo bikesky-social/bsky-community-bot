@@ -2,6 +2,7 @@ import { BlueskyCommunityBot } from "./BlueskyCommunityBot";
 import type { Request, Response } from "express";
 import { AtpAgent } from "@atproto/api";
 import type { LabelerPolicies } from "@atproto/api/dist/client/types/app/bsky/labeler/defs";
+import * as LabelerDefs from "@atproto/api/dist/client/types/app/bsky/labeler/defs";
 import type { ComAtprotoLabelDefs } from "@atcute/client/lexicons";
 import { Canvas, loadImage } from "canvas";
 import opentype from "opentype.js";
@@ -123,18 +124,27 @@ export class LabelPoliciesKeeper {
         dids: [this.blueskyCommunityBot.labelerBot.profile.did],
         detailed: true,
       });
-      this.labelerPolicies = labelDefs.data.views[0]
-        .policies as LabelerPolicies;
 
-      this.labelOptionsImagePayloadCache = {};
+      const view = labelDefs.data.views[0];
 
-      console.log("updated label defs");
+      if (LabelerDefs.isLabelerViewDetailed(view)) {
+        this.labelerPolicies = view.policies as LabelerPolicies;
 
-      if (this.validateSelfServeLabels() && this.validateVerifiedLabels()) {
-        this.hasValidSelfServeLabels = true;
+        this.labelOptionsImagePayloadCache = {};
+
+        console.log("updated label defs");
+
+        if (this.validateSelfServeLabels() && this.validateVerifiedLabels()) {
+          this.hasValidSelfServeLabels = true;
+        }
+
+        return true;
+      }
+      else {
+        console.log("returned labeler view was not detailed");
       }
 
-      return true;
+      return false;
     } catch (error) {
       return false;
     }
