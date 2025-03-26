@@ -230,6 +230,9 @@ export class BlueskyCommunityBot {
 
     // start the server
 
+    this.server.set("view engine", "ejs");
+    this.server.set("views", __dirname + "/../views");
+
     this.server.get("/health", (req, res) => {
       res.json({ health: "ok" });
     });

@@ -41,6 +41,11 @@ export class LabelPoliciesKeeper {
       this.getLabelImageRoute.bind(this)
     );
 
+    this.blueskyCommunityBot.server.get(
+      "/labels",
+      this.getLabelRoute.bind(this)
+    );
+
     await this.updateLabelPolicies();
   }
 
@@ -139,8 +144,7 @@ export class LabelPoliciesKeeper {
         }
 
         return true;
-      }
-      else {
+      } else {
         console.log("returned labeler view was not detailed");
       }
 
@@ -415,6 +419,10 @@ export class LabelPoliciesKeeper {
     );
     res.type("png");
     res.end(imageOptionsPayload.labelOptionsCanvas.toBuffer("image/png"));
+  }
+
+  async getLabelRoute(req: Request, res: Response) {
+    res.render("pages/labels");
   }
 
   async getTargetSelfServeLabels(
