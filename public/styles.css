@@ -6,9 +6,15 @@
     'Noto Color Emoji';
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
     monospace;
+    --color-emerald-900: oklch(0.378 0.077 168.94);
+    --color-emerald-950: oklch(0.262 0.051 172.552);
     --color-gray-50: oklch(0.985 0.002 247.839);
+    --color-gray-800: oklch(0.278 0.033 256.848);
+    --color-gray-900: oklch(0.21 0.034 264.665);
     --spacing: 0.25rem;
+    --text-xs: 0.75rem;
     --text-sm: 0.875rem;
+    --text-lg: 1.125rem;
     --text-2xl: 1.5rem;
     --text-2xl--line-height: calc(2 / 1.5);
     --font-weight-semibold: 600;
@@ -17,8 +23,6 @@
     --radius-2xl: 1rem;
     --default-font-family: var(--font-sans);
     --default-mono-font-family: var(--font-mono);
-    --color-bikesky-bg: oklch(23.48% 0.0218 248.77);
-    --color-bikesky-rect: oklch(27.54% 0.0279 248.87);
   }
 }
 @layer base {
@@ -170,6 +174,9 @@
   .col-start-2 {
     grid-column-start: 2;
   }
+  .my-1 {
+    margin-block: calc(var(--spacing) * 1);
+  }
   .my-3 {
     margin-block: calc(var(--spacing) * 3);
   }
@@ -212,11 +219,14 @@
   .rounded-lg {
     border-radius: var(--radius-lg);
   }
-  .bg-bikesky-bg {
-    background-color: var(--color-bikesky-bg);
+  .bg-emerald-950 {
+    background-color: var(--color-emerald-950);
   }
-  .bg-bikesky-rect {
-    background-color: var(--color-bikesky-rect);
+  .bg-gray-800 {
+    background-color: var(--color-gray-800);
+  }
+  .bg-gray-900 {
+    background-color: var(--color-gray-900);
   }
   .p-2 {
     padding: calc(var(--spacing) * 2);
@@ -231,13 +241,24 @@
     font-size: var(--text-2xl);
     line-height: var(--tw-leading, var(--text-2xl--line-height));
   }
+  .text-lg\/loose {
+    font-size: var(--text-lg);
+    line-height: var(--leading-loose);
+  }
   .text-sm\/loose {
     font-size: var(--text-sm);
+    line-height: var(--leading-loose);
+  }
+  .text-xs\/loose {
+    font-size: var(--text-xs);
     line-height: var(--leading-loose);
   }
   .font-semibold {
     --tw-font-weight: var(--font-weight-semibold);
     font-weight: var(--font-weight-semibold);
+  }
+  .text-emerald-900 {
+    color: var(--color-emerald-900);
   }
   .text-gray-50 {
     color: var(--color-gray-50);
