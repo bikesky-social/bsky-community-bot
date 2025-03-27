@@ -6,9 +6,8 @@
     'Noto Color Emoji';
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
     monospace;
-    --color-emerald-900: oklch(0.378 0.077 168.94);
-    --color-emerald-950: oklch(0.262 0.051 172.552);
     --color-gray-50: oklch(0.985 0.002 247.839);
+    --color-gray-400: oklch(0.707 0.022 261.325);
     --color-gray-800: oklch(0.278 0.033 256.848);
     --color-gray-900: oklch(0.21 0.034 264.665);
     --spacing: 0.25rem;
@@ -219,17 +218,11 @@
   .rounded-lg {
     border-radius: var(--radius-lg);
   }
-  .bg-emerald-950 {
-    background-color: var(--color-emerald-950);
-  }
   .bg-gray-800 {
     background-color: var(--color-gray-800);
   }
   .bg-gray-900 {
     background-color: var(--color-gray-900);
-  }
-  .p-2 {
-    padding: calc(var(--spacing) * 2);
   }
   .p-3 {
     padding: calc(var(--spacing) * 3);
@@ -257,11 +250,11 @@
     --tw-font-weight: var(--font-weight-semibold);
     font-weight: var(--font-weight-semibold);
   }
-  .text-emerald-900 {
-    color: var(--color-emerald-900);
-  }
   .text-gray-50 {
     color: var(--color-gray-50);
+  }
+  .text-gray-400 {
+    color: var(--color-gray-400);
   }
   .italic {
     font-style: italic;
