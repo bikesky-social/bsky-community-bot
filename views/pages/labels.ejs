@@ -23,6 +23,7 @@
         <% }); %>
       </ol>
     </div>
+    <% if (selfServeVerifiedLabelNames.length > 0) { %>
     <div class="rounded-lg bg-emerald-950 p-3">
       <p class="text-lg/loose">Verified Labels ✅</p>
       <hr class="text-emerald-900 my-1"/>
@@ -36,6 +37,7 @@
       <p class="text-right italic text-xs/loose">Note: these labels will require manual verification</p>
     </div>
   </div>
+  <% } %>
 </div>
 </main>
 
