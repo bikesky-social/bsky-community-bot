@@ -423,20 +423,24 @@ export class LabelPoliciesKeeper {
 
   async getLabelRoute(req: Request, res: Response) {
     const locales = req.query["locale"] ? [req.query["locale"] as string] : [];
+    const translate = this.blueskyCommunityBot.getFixedT(locales, "label");
 
-    let difference = this.blueskyCommunityBot.options.selfServeLabelIdentifiers.filter(x => !this.blueskyCommunityBot.options.verifiedLabels.includes(x));
+    let difference =
+      this.blueskyCommunityBot.options.selfServeLabelIdentifiers.filter(
+        (x) => !this.blueskyCommunityBot.options.verifiedLabels.includes(x)
+      );
 
     res.render("pages/labels", {
       labelerAvatarUrl: this.blueskyCommunityBot.labelerBot.profile.avatar,
-      labelerDisplayName: this.blueskyCommunityBot.labelerBot.profile.displayName,
-      selfServeLabelNames: this.getLabelNames(
-        difference,
-        locales
-      ),
+      labelerDisplayName:
+        this.blueskyCommunityBot.labelerBot.profile.displayName,
+      selfServeLabelNames: this.getLabelNames(difference, locales),
       selfServeVerifiedLabelNames: this.getLabelNames(
         this.blueskyCommunityBot.options.verifiedLabels,
         locales
       ),
+      verifiedLabelsHeading: translate("webpage.verifiedLabelsHeading"),
+      manualVerificationNotice: translate("webpage.manualVerificationNotice"),
     });
   }
 

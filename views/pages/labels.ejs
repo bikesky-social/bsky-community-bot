@@ -25,7 +25,7 @@
     </div>
     <% if (selfServeVerifiedLabelNames.length > 0) { %>
     <div class="rounded-lg bg-emerald-950 p-3">
-      <p class="text-lg/loose">Verified Labels ✅</p>
+      <p class="text-lg/loose"><%= verifiedLabelsHeading %> ✅</p>
       <hr class="text-emerald-900 my-1"/>
       <ol start="<%= selfServeLabelNames.length+1 %>" class="list-inside list-decimal columns-2">
         <% selfServeVerifiedLabelNames.forEach(function(labelName) { %>
@@ -34,7 +34,7 @@
           </li>
         <% }); %>
       </ol>
-      <p class="text-right italic text-xs/loose">Note: these labels will require manual verification</p>
+      <p class="text-right italic text-xs/loose"><%= manualVerificationNotice %></p>
     </div>
   </div>
   <% } %>
