@@ -232,6 +232,7 @@ export class BlueskyCommunityBot {
 
     this.server.set("view engine", "ejs");
     this.server.set("views", __dirname + "/../views");
+    this.server.use(express.static(__dirname + "/../public"));
 
     this.server.get("/health", (req, res) => {
       res.json({ health: "ok" });
