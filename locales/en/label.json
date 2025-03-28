@@ -2,7 +2,6 @@
   "post": {
     "intro": "Let's get you some labels!",
     "instructions":"Here's a list of our labels. Please reply with the numbers of the labels you would like separated by commas. For example, if you want ({{labelExamples}}), reply with: {{numberList}}",
-    "verification":"* Labels with asterisks will require manual verification",
     "labelsAltText":"Image with a title: {{labelerDisplayName}}. Beneath the title is a list of numbered options:",
     "success":"Okay, I put these labels on your account: {{appliedLabelNames}}",
     "unlabelInstruction":"If you ever want to remove a label, send me a post that says: {{unlabelCommand}}",

@@ -93,10 +93,6 @@ export class LabelCommand extends Command {
       "\n\n" +
       translate("post.instructions", { labelExamples: "", numberList: "" });
 
-    if (this.blueskyCommunityBot.options.verifiedLabels.length > 0) {
-      emptyPost += "\n\n" + translate("post.verification");
-    }
-
     const maxExampleLength =
       this.blueskyCommunityBot.options.maxPostLength - emptyPost.length;
 
@@ -150,10 +146,6 @@ export class LabelCommand extends Command {
         numberList: exampleIndexes.join(","),
       });
 
-    if (this.blueskyCommunityBot.options.verifiedLabels.length > 0) {
-      postText += "\n\n" + translate("post.verification");
-    }
-
     // fetch the image payload
     const imagePayload =
       await this.blueskyCommunityBot.labelPoliciesKeeper.getLabelOptionsImagePayload(
@@ -165,12 +157,12 @@ export class LabelCommand extends Command {
       text: postText,
       images: [
         {
-          data: imagePayload.labelOptionsCanvasBlob,
+          data: imagePayload.imageBlob,
           aspectRatio: {
-            width: imagePayload.labelOptionsCanvas.width,
-            height: imagePayload.labelOptionsCanvas.height,
+            width: imagePayload.imageDimensions.width,
+            height: imagePayload.imageDimensions.height,
           },
-          alt: imagePayload.labelOptionsAltText,
+          alt: imagePayload.altText,
         },
       ],
       langs: [translate("post.intro", { returnDetails: true }).usedLng],

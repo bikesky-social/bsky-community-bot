@@ -4,15 +4,15 @@ import { AtpAgent } from "@atproto/api";
 import type { LabelerPolicies } from "@atproto/api/dist/client/types/app/bsky/labeler/defs";
 import * as LabelerDefs from "@atproto/api/dist/client/types/app/bsky/labeler/defs";
 import type { ComAtprotoLabelDefs } from "@atcute/client/lexicons";
-import { Canvas, loadImage } from "canvas";
-import opentype from "opentype.js";
-import drawText from "node-canvas-text";
-import emojiRegex from "emoji-regex";
+import { chromium } from "playwright";
+import { imageSize } from "image-size";
+import type { ISizeCalculationResult } from "image-size/types/interface";
 
 type LabelOptionsImagePayload = {
-  labelOptionsCanvas: Canvas;
-  labelOptionsCanvasBlob: Blob;
-  labelOptionsAltText: string;
+  imageBuffer: Buffer;
+  imageBlob: Blob;
+  imageDimensions: ISizeCalculationResult;
+  altText: string;
 };
 
 export class LabelPoliciesKeeper {
@@ -192,67 +192,16 @@ export class LabelPoliciesKeeper {
     return undefined;
   }
 
-  async getLabelOptionsImagePayload(
-    locales: string[]
-  ): Promise<LabelOptionsImagePayload> {
-    const cache = this.getCachedLabelOptionsImagePayload(locales);
-    if (cache) {
-      return cache;
-    }
-
-    const payload: LabelOptionsImagePayload = {
-      labelOptionsAltText: "",
-      labelOptionsCanvas: new Canvas(1, 1),
-      labelOptionsCanvasBlob: new Blob(),
-    };
-
-    const width = 1290;
-    const marginVertical = 200;
-    const marginHorizontal = 50;
-    const innerMarginVertical = 10;
-    const innerMarginHorizontal = 10;
+  getLabelOptionsImageAltText(locales: string[]) {
+    let altText = "";
 
     const translate = this.blueskyCommunityBot.getFixedT(locales, "label");
-    payload.labelOptionsAltText = translate("post.labelsAltText", {
+    altText = translate("post.labelsAltText", {
       labelerDisplayName:
         this.blueskyCommunityBot.labelerBot.profile.displayName,
     });
 
     if (this.labelerPolicies.labelValueDefinitions) {
-      const fontDir = __dirname + "/../fonts";
-      const font = await opentype.load(`${fontDir}/InterVariable.ttf`);
-
-      const rows = Math.round(
-        this.blueskyCommunityBot.options.selfServeLabelIdentifiers.length / 2
-      );
-
-      const rowHeight = 60;
-      const height = 281 + rowHeight * rows;
-
-      payload.labelOptionsCanvas = new Canvas(width, height);
-      const context = payload.labelOptionsCanvas.getContext("2d");
-
-      // draw background
-
-      context.fillStyle = "#161f28";
-      context.fillRect(0, 0, width, height);
-
-      // draw round rect
-
-      const roundMarginHorizontal = 30;
-
-      context.fillStyle = "#1d2935";
-      context.roundRect(
-        roundMarginHorizontal,
-        marginVertical,
-        width - roundMarginHorizontal * 2,
-        rowHeight * rows + 25,
-        12
-      );
-      context.fill();
-
-      // draw label names
-
       for (
         let i = 0;
         i < this.blueskyCommunityBot.options.selfServeLabelIdentifiers.length;
@@ -269,146 +218,74 @@ export class LabelPoliciesKeeper {
             : this.getLabelName(labelIdentifier, locales);
         const labelName = `${i + 1}. ${labelText}`;
 
-        payload.labelOptionsAltText = payload.labelOptionsAltText.concat(
-          `\n${labelName}`
-        );
-
-        // const outerRect = {
-        //   x:
-        //     i % 2
-        //       ? LabelCommand.labelOptionsCanvas.width / 2
-        //       : 0 + marginHorizontal,
-        //   y:
-        //     i % 2
-        //       ? marginVertical + ((i - 1) / 2) * rowHeight
-        //       : marginVertical + (i / 2) * rowHeight,
-        //   width: LabelCommand.labelOptionsCanvas.width / 2 - marginHorizontal,
-        //   height: rowHeight,
-        // };
-
-        // drawText(context, "", font, outerRect, {
-        //   minSize: 13,
-        //   maxSize: 100,
-        //   vAlign: "bottom",
-        //   hAlign: "left",
-        //   fitMethod: "baseline",
-        //   textFillStyle: "#fff",
-        //   drawRect: false,
-        // });
-
-        // inner rect
-        const textRect = {
-          x:
-            i % 2
-              ? payload.labelOptionsCanvas.width / 2 + innerMarginHorizontal
-              : marginHorizontal + innerMarginHorizontal,
-          y:
-            i % 2
-              ? marginVertical + innerMarginVertical + ((i - 1) / 2) * rowHeight
-              : marginVertical + innerMarginVertical + (i / 2) * rowHeight,
-          width:
-            payload.labelOptionsCanvas.width / 2 -
-            marginHorizontal -
-            innerMarginHorizontal * 2,
-          height: rowHeight - innerMarginVertical * 2,
-        };
-
-        drawText(
-          context as any,
-          labelName.replace(emojiRegex(), "").trim(),
-          font,
-          textRect,
-          {
-            minSize: 13,
-            maxSize: 32,
-            vAlign: "bottom",
-            hAlign: "left",
-            fitMethod: "baseline",
-            textFillStyle: "#fff",
-            drawRect: false,
-          }
-        );
+        altText = altText.concat(`\n${labelName}`);
       }
-
-      const logoRadius = 70;
-
-      // draw labeler display name
-
-      const displayName = this.blueskyCommunityBot.labelerBot.profile
-        .displayName
-        ? this.blueskyCommunityBot.labelerBot.profile.displayName
-        : "";
-
-      const titleFont = await opentype.load(`${fontDir}/Inter-Black.ttf`);
-
-      drawText(
-        context as any,
-        displayName.replace(emojiRegex(), "").trim(),
-        titleFont,
-        {
-          x: marginHorizontal * 1.5 + logoRadius * 2,
-          y: marginVertical / 2 - logoRadius,
-          width:
-            width - marginHorizontal - (marginHorizontal * 2 + logoRadius * 2),
-          height: logoRadius * 2,
-        },
-        {
-          minSize: 13,
-          maxSize: 66,
-          vAlign: "center",
-          hAlign: "left",
-          fitMethod: "box",
-          textFillStyle: "#fff",
-          drawRect: false,
-        }
-      );
-
-      // draw labeler avatar
-
-      const circle = {
-        x: logoRadius + marginHorizontal,
-        y: marginVertical / 2,
-        radius: 70,
-      };
-
-      const avatar = await loadImage(
-        this.blueskyCommunityBot.labelerBot.profile.avatar as string
-      );
-
-      const aspectRatio = avatar.height / avatar.width;
-      const hsx = circle.radius * Math.max(1.0 / aspectRatio, 1.0);
-      const hsy = circle.radius * Math.max(aspectRatio, 1.0);
-
-      context.beginPath();
-      // context.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2, true);
-      context.roundRect(
-        circle.x - hsx,
-        circle.y - hsy,
-        hsx * 2,
-        hsy * 2,
-        (hsx * 2) / 11.25
-      );
-      context.closePath();
-      context.clip();
-
-      context.drawImage(
-        avatar,
-        circle.x - hsx,
-        circle.y - hsy,
-        hsx * 2,
-        hsy * 2
-      );
     }
 
-    payload.labelOptionsCanvasBlob = this.dataURItoBlob(
-      payload.labelOptionsCanvas.toDataURL()
+    return altText;
+  }
+
+  async getLabelOptionsImagePayload(
+    locales: string[]
+  ): Promise<LabelOptionsImagePayload> {
+    const cache = this.getCachedLabelOptionsImagePayload(locales);
+    if (cache) {
+      return cache;
+    }
+
+    const browser = await chromium.launch();
+    const page = await browser.newPage({ deviceScaleFactor: 2 });
+    await page.setViewportSize({ width: 480, height: 0 });
+
+    const translate = this.blueskyCommunityBot.getFixedT(locales, "label");
+
+    let difference =
+      this.blueskyCommunityBot.options.selfServeLabelIdentifiers.filter(
+        (x) => !this.blueskyCommunityBot.options.verifiedLabels.includes(x)
+      );
+
+    let labelHtml = "";
+
+    this.blueskyCommunityBot.server.render(
+      "pages/labels",
+      {
+        labelerAvatarUrl: this.blueskyCommunityBot.labelerBot.profile.avatar,
+        labelerDisplayName:
+          this.blueskyCommunityBot.labelerBot.profile.displayName,
+        selfServeLabelNames: this.getLabelNames(difference, locales),
+        selfServeVerifiedLabelNames: this.getLabelNames(
+          this.blueskyCommunityBot.options.verifiedLabels,
+          locales
+        ),
+        verifiedLabelsHeading: translate("webpage.verifiedLabelsHeading"),
+        manualVerificationNotice: translate("webpage.manualVerificationNotice"),
+      },
+      (error, html) => {
+        labelHtml = html;
+      }
     );
 
-    console.log(`generated label options image for locales: ${locales}`);
+    await page.setContent(labelHtml);
+
+    const buffer = await page.screenshot({
+      type: "png",
+      scale: "device",
+      fullPage: true,
+    });
+    await browser.close();
+
+    const payload: LabelOptionsImagePayload = {
+      imageBuffer: buffer,
+      imageBlob: new Blob([buffer], { type: "image/png" }),
+      imageDimensions: imageSize(buffer),
+      altText: this.getLabelOptionsImageAltText(locales),
+    };
 
     this.labelOptionsImagePayloadCache[
       this.getLabelOptionsImagePayloadCacheKey(locales)
     ] = payload;
+
+    console.log(`generated label options image for locales: ${locales}`);
 
     return payload;
   }
@@ -418,7 +295,7 @@ export class LabelPoliciesKeeper {
       req.query["locale"] ? [req.query["locale"] as string] : []
     );
     res.type("png");
-    res.end(imageOptionsPayload.labelOptionsCanvas.toBuffer("image/png"));
+    res.end(imageOptionsPayload.imageBuffer);
   }
 
   async getLabelRoute(req: Request, res: Response) {
