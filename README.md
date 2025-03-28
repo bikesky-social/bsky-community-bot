@@ -83,6 +83,7 @@ docker run -p 3000:3000 \
 -e PORT=3000 \
 -e MAX_POST_LENGTH=300 \
 -e MAX_LABELS=3 \
+-e LABEL_DISPLAY_COLUMNS=2 \
 -e SELF_SERVE_LABEL_IDENTIFIERS=label-1,label-2,label-3,label-4 \
 -e VERIFIED_LABELS=label-3,label-4 \
 -e LABEL_VERIFICATION_EMAIL=replace_with_email_address \
@@ -112,6 +113,7 @@ const bot = new BlueskyCommunityBot({
   port: 3000,
   maxPostLength: 300,
   maxLabels: 3,
+  labelDisplayColumns:2,
   selfServeLabelIdentifiers: ["label-1","label-2","label-3","label-4"],
   verifiedLabels: ["label-3","label-4"],
   labelVerificationEmail: "replace.this@example.com",
