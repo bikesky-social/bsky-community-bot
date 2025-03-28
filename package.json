@@ -40,6 +40,7 @@
     "src",
     "fonts",
     "locales",
+    "views",
     "package.json"
   ],
   "scripts": {
