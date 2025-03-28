@@ -260,11 +260,6 @@ export class LabelPoliciesKeeper {
 
     const browser = await chromium.launch();
     const page = await browser.newPage({ deviceScaleFactor: 2 });
-    await page.setViewportSize({
-      width:
-        240 * renderOptions.columns < 320 ? 320 : 240 * renderOptions.columns,
-      height: 0,
-    });
 
     let labelHtml = "";
 
@@ -277,6 +272,17 @@ export class LabelPoliciesKeeper {
     );
 
     await page.setContent(labelHtml);
+
+    const element = await page.getByTitle("labels");
+    const boundingBox = await element?.boundingBox();
+    console.log(`column width: ${boundingBox?.width}`);
+
+    const width = boundingBox?.width ? boundingBox?.width : 0;
+
+    await page.setViewportSize({
+      width: Math.round(width + 25),
+      height: 0,
+    });
 
     const buffer = await page.screenshot({
       type: "png",
