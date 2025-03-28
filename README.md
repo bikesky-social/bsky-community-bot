@@ -46,6 +46,9 @@ MAX_POST_LENGTH=300
 # set this to -1 for unlimited labels
 MAX_LABELS=3
 
+# the number of columns to display on the label image
+LABEL_DISPLAY_COLUMNS=2
+
 # a comma-separated list of identifiers of labels that the bot will offer to apply (required)
 # all of these label identifiers must exist in the labeler's service record. if they aren't, the bot will say the label and unlabel commands are not available
 SELF_SERVE_LABEL_IDENTIFIERS=label-1,label-2,label-3,label-4

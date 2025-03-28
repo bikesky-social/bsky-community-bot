@@ -225,6 +225,29 @@ export class LabelPoliciesKeeper {
     return altText;
   }
 
+  getLabelsRouteRenderOptions(locales: string[]) {
+    const translate = this.blueskyCommunityBot.getFixedT(locales, "label");
+
+    let difference =
+      this.blueskyCommunityBot.options.selfServeLabelIdentifiers.filter(
+        (x) => !this.blueskyCommunityBot.options.verifiedLabels.includes(x)
+      );
+
+    return {
+      labelerAvatarUrl: this.blueskyCommunityBot.labelerBot.profile.avatar,
+      labelerDisplayName:
+        this.blueskyCommunityBot.labelerBot.profile.displayName,
+      selfServeLabelNames: this.getLabelNames(difference, locales),
+      selfServeVerifiedLabelNames: this.getLabelNames(
+        this.blueskyCommunityBot.options.verifiedLabels,
+        locales
+      ),
+      verifiedLabelsHeading: translate("webpage.verifiedLabelsHeading"),
+      manualVerificationNotice: translate("webpage.manualVerificationNotice"),
+      columns: this.blueskyCommunityBot.options.labelDisplayColumns,
+    };
+  }
+
   async getLabelOptionsImagePayload(
     locales: string[]
   ): Promise<LabelOptionsImagePayload> {
@@ -233,33 +256,21 @@ export class LabelPoliciesKeeper {
       return cache;
     }
 
+    const renderOptions = this.getLabelsRouteRenderOptions(locales);
+
     const browser = await chromium.launch();
     const page = await browser.newPage({ deviceScaleFactor: 2 });
-    await page.setViewportSize({ width: 480, height: 0 });
-
-    const translate = this.blueskyCommunityBot.getFixedT(locales, "label");
-
-    let difference =
-      this.blueskyCommunityBot.options.selfServeLabelIdentifiers.filter(
-        (x) => !this.blueskyCommunityBot.options.verifiedLabels.includes(x)
-      );
+    await page.setViewportSize({
+      width:
+        240 * renderOptions.columns < 320 ? 320 : 240 * renderOptions.columns,
+      height: 0,
+    });
 
     let labelHtml = "";
 
     this.blueskyCommunityBot.server.render(
       "pages/labels",
-      {
-        labelerAvatarUrl: this.blueskyCommunityBot.labelerBot.profile.avatar,
-        labelerDisplayName:
-          this.blueskyCommunityBot.labelerBot.profile.displayName,
-        selfServeLabelNames: this.getLabelNames(difference, locales),
-        selfServeVerifiedLabelNames: this.getLabelNames(
-          this.blueskyCommunityBot.options.verifiedLabels,
-          locales
-        ),
-        verifiedLabelsHeading: translate("webpage.verifiedLabelsHeading"),
-        manualVerificationNotice: translate("webpage.manualVerificationNotice"),
-      },
+      renderOptions,
       (error, html) => {
         labelHtml = html;
       }
@@ -307,18 +318,7 @@ export class LabelPoliciesKeeper {
         (x) => !this.blueskyCommunityBot.options.verifiedLabels.includes(x)
       );
 
-    res.render("pages/labels", {
-      labelerAvatarUrl: this.blueskyCommunityBot.labelerBot.profile.avatar,
-      labelerDisplayName:
-        this.blueskyCommunityBot.labelerBot.profile.displayName,
-      selfServeLabelNames: this.getLabelNames(difference, locales),
-      selfServeVerifiedLabelNames: this.getLabelNames(
-        this.blueskyCommunityBot.options.verifiedLabels,
-        locales
-      ),
-      verifiedLabelsHeading: translate("webpage.verifiedLabelsHeading"),
-      manualVerificationNotice: translate("webpage.manualVerificationNotice"),
-    });
+    res.render("pages/labels", this.getLabelsRouteRenderOptions(locales));
   }
 
   async getTargetSelfServeLabels(

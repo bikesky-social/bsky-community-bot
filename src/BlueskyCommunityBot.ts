@@ -16,6 +16,7 @@ type BlueskyCommunityBotOptions = {
   port: number;
   maxPostLength: number;
   maxLabels: number;
+  labelDisplayColumns: number;
   selfServeLabelIdentifiers: string[];
   verifiedLabels: string[];
   labelVerificationEmail?: string;

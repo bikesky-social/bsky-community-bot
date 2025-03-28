@@ -17,7 +17,7 @@
       <h1 class="ml-2.5 text-2xl font-semibold"><%= labelerDisplayName %></h1>
     </div>
     <div class="my-3 rounded-lg bg-gray-800 p-3">
-      <ol class="list-inside list-decimal columns-2">
+      <ol class="list-inside list-decimal" style="columns: <%= columns %>">
         <% selfServeLabelNames.forEach(function(labelName) { %>
           <li>
             <%= labelName %>
@@ -29,7 +29,7 @@
     <div class="rounded-lg bg-gray-800 p-3">
       <p class="text-lg/loose"><%= verifiedLabelsHeading %> ✅</p>
       <hr class="text-gray-400 my-1"/>
-      <ol start="<%= selfServeLabelNames.length+1 %>" class="list-inside list-decimal columns-2">
+      <ol start="<%= selfServeLabelNames.length+1 %>" class="list-inside list-decimal" style="columns: <%= columns %>">
         <% selfServeVerifiedLabelNames.forEach(function(labelName) { %>
           <li>
             <%= labelName %>

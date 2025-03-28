@@ -200,9 +200,6 @@
   .list-decimal {
     list-style-type: decimal;
   }
-  .columns-2 {
-    columns: 2;
-  }
   .grid-cols-\[1fr_auto_1fr\] {
     grid-template-columns: 1fr auto 1fr;
   }
