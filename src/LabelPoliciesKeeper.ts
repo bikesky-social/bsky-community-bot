@@ -271,7 +271,7 @@ export class LabelPoliciesKeeper {
       }
     );
 
-    await page.setContent(labelHtml);
+    await page.setContent(labelHtml, { waitUntil: "domcontentloaded" });
 
     const element = await page.getByTitle("labels");
     const boundingBox = await element?.boundingBox();
