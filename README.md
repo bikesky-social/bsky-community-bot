@@ -46,9 +46,6 @@ MAX_POST_LENGTH=300
 # set this to -1 for unlimited labels
 MAX_LABELS=3
 
-# the number of columns to display on the label image
-LABEL_DISPLAY_COLUMNS=2
-
 # a comma-separated list of identifiers of labels that the bot will offer to apply (required)
 # all of these label identifiers must exist in the labeler's service record. if they aren't, the bot will say the label and unlabel commands are not available
 SELF_SERVE_LABEL_IDENTIFIERS=label-1,label-2,label-3,label-4
@@ -83,7 +80,6 @@ docker run -p 3000:3000 \
 -e PORT=3000 \
 -e MAX_POST_LENGTH=300 \
 -e MAX_LABELS=3 \
--e LABEL_DISPLAY_COLUMNS=2 \
 -e SELF_SERVE_LABEL_IDENTIFIERS=label-1,label-2,label-3,label-4 \
 -e VERIFIED_LABELS=label-3,label-4 \
 -e LABEL_VERIFICATION_EMAIL=replace_with_email_address \
@@ -113,7 +109,6 @@ const bot = new BlueskyCommunityBot({
   port: 3000,
   maxPostLength: 300,
   maxLabels: 3,
-  labelDisplayColumns:2,
   selfServeLabelIdentifiers: ["label-1","label-2","label-3","label-4"],
   verifiedLabels: ["label-3","label-4"],
   labelVerificationEmail: "replace.this@example.com",

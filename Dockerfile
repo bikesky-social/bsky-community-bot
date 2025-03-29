@@ -34,10 +34,6 @@ COPY --from=prerelease /usr/src/app/main.ts .
 COPY --from=prerelease /usr/src/app/src src
 COPY --from=prerelease /usr/src/app/fonts fonts
 COPY --from=prerelease /usr/src/app/locales locales
-COPY --from=prerelease /usr/src/app/views views
-
-ENV PLAYWRIGHT_BROWSERS_PATH=/usr/lib/playwright
-RUN bunx playwright install --with-deps
 
 # run the app
 USER bun
