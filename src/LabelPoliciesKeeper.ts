@@ -271,7 +271,7 @@ export class LabelPoliciesKeeper {
       }
     );
 
-    await page.setContent(labelHtml, { waitUntil: "domcontentloaded" });
+    await page.setContent(labelHtml, { waitUntil: "load" });
 
     const element = await page.getByTitle("labels");
     const boundingBox = await element?.boundingBox();
@@ -281,7 +281,7 @@ export class LabelPoliciesKeeper {
 
     await page.setViewportSize({
       width: Math.round(width + 25),
-      height: 0,
+      height: 1,
     });
 
     const buffer = await page.screenshot({
