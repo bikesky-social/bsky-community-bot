@@ -3,6 +3,7 @@ name: Publish to Docker Hub
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   push_to_registry:
