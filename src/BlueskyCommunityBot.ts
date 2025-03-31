@@ -95,8 +95,7 @@ export class BlueskyCommunityBot {
       : `${post.cid}.${post.author.did}`;
   }
 
-  async go() {
-    // initialize i18n
+  initi18next() {
     const localesDir = __dirname + "/../locales";
     this.i18n.init({
       fallbackLng: this.options.defaultLocale,
@@ -112,6 +111,129 @@ export class BlueskyCommunityBot {
     });
 
     console.log("initialized i18n");
+  }
+
+  startServer() {
+    this.server.set("view engine", "ejs");
+    this.server.set("views", __dirname + "/../views");
+
+    this.server.get("/health", (req, res) => {
+      res.json({ health: "ok" });
+    });
+
+    this.server.use(function (req, res) {
+      res.status(404).json({ error: "404" });
+    });
+
+    this.server.listen(this.options.port, () => {
+      console.log(`server listening on port ${this.options.port}`);
+    });
+  }
+
+  async botOpen() {
+    console.log("open: labeler bot has begun listening for events");
+  }
+
+  async botClose() {
+    console.log("closed: labeler bot has stopped listening for events");
+  }
+
+  async botError(error: unknown) {
+    console.log(`labeler bot error occurred: ${error}`);
+  }
+
+  async botMention(post: Post) {
+    const cmd = this.getCommandByPost(post);
+
+    if (cmd) {
+      console.log(
+        `[mention] command received from ${post.author.did}: ${post.text} (${post.uri})`
+      );
+
+      const t = this.getFixedT(post.langs ? post.langs : [], cmd.commandName);
+      await cmd.mention(post, t, post.author.did);
+    }
+  }
+
+  async botReply(reply: Post) {
+    if (reply.replyRef?.parent.uri) {
+      try {
+        const rkey = reply.replyRef.parent.uri.split("/").pop() as string;
+        const record = await this.chatBot.agent.get(
+          "com.atproto.repo.getRecord",
+          {
+            params: {
+              repo: this.chatBot.profile.did,
+              collection:
+                BskyCommunityBotLexicons.ids
+                  .AppBikeskyCommunityBotCommandPrompt,
+              rkey: rkey,
+            },
+          }
+        );
+
+        const recordValue = record.data.value;
+
+        if (
+          CommandPrompt.isRecord(recordValue) &&
+          CommandPrompt.validateRecord(recordValue).success
+        ) {
+          const commandPrompt = recordValue as CommandPrompt.Record;
+
+          let allow = true;
+
+          if (commandPrompt.allow) {
+            for (let i = 0; i < commandPrompt.allow.length; i++) {
+              const rule = commandPrompt.allow[i];
+
+              if (CommandPrompt.isDidListRule(rule)) {
+                if (rule.list.includes(reply.author.did) === false) {
+                  allow = false;
+                }
+              }
+
+              if (CommandPrompt.isLabelRule(rule)) {
+                const labels = await this.labelPoliciesKeeper.getTargetLabels(
+                  reply.author.did
+                );
+                const labelIdentifiers = labels.map((label) => label.val);
+                if (
+                  (labelIdentifiers.includes(rule.label) &&
+                    rule.access === "disallowed") ||
+                  (labelIdentifiers.includes(rule.label) === false &&
+                    rule.access === "allow")
+                ) {
+                  allow = false;
+                }
+              }
+            }
+          }
+
+          if (allow) {
+            const cmd = this.commandMap[commandPrompt.command];
+            if (cmd) {
+              console.log(
+                `[reply] command received from ${reply.author.did}: ${reply.text} (${reply.uri})`
+              );
+
+              const t = this.getFixedT(
+                reply.langs ? reply.langs : [],
+                commandPrompt.command
+              );
+              const commandResult = await cmd.reply(commandPrompt, reply, t);
+            }
+          }
+        }
+      } catch (error) {
+        console.log(`failed to fetch command prompt: ${JSON.stringify(error)}`);
+      }
+    }
+  }
+
+  async go() {
+    // initialize i18n
+
+    this.initi18next();
 
     //  initialize labeler bot
 
@@ -140,123 +262,14 @@ export class BlueskyCommunityBot {
 
     // labeler bot handlers
 
-    this.chatBot.on("open", async () => {
-      console.log("open: labeler bot has begun listening for events");
-    });
-
-    this.chatBot.on("close", async () => {
-      console.log("closed: labeler bot has stopped listening for events");
-    });
-
-    this.chatBot.on("error", async (error) => {
-      console.log(`labeler bot error occurred: ${error}`);
-    });
-
-    this.chatBot.on("mention", async (post) => {
-      const cmd = this.getCommandByPost(post);
-
-      if (cmd) {
-        console.log(
-          `[mention] command received from ${post.author.did}: ${post.text} (${post.uri})`
-        );
-
-        const t = this.getFixedT(post.langs ? post.langs : [], cmd.commandName);
-        await cmd.mention(post, t, post.author.did);
-      }
-    });
-
-    this.chatBot.on("reply", async (reply) => {
-      if (reply.replyRef?.parent.uri) {
-        try {
-          const rkey = reply.replyRef.parent.uri.split("/").pop() as string;
-          const record = await this.chatBot.agent.get(
-            "com.atproto.repo.getRecord",
-            {
-              params: {
-                repo: this.chatBot.profile.did,
-                collection:
-                  BskyCommunityBotLexicons.ids
-                    .AppBikeskyCommunityBotCommandPrompt,
-                rkey: rkey,
-              },
-            }
-          );
-
-          const recordValue = record.data.value;
-
-          if (
-            CommandPrompt.isRecord(recordValue) &&
-            CommandPrompt.validateRecord(recordValue).success
-          ) {
-            const commandPrompt = recordValue as CommandPrompt.Record;
-
-            let allow = true;
-
-            if (commandPrompt.allow) {
-              for (let i = 0; i < commandPrompt.allow.length; i++) {
-                const rule = commandPrompt.allow[i];
-
-                if (CommandPrompt.isDidListRule(rule)) {
-                  if (rule.list.includes(reply.author.did) === false) {
-                    allow = false;
-                  }
-                }
-
-                if (CommandPrompt.isLabelRule(rule)) {
-                  const labels = await this.labelPoliciesKeeper.getTargetLabels(
-                    reply.author.did
-                  );
-                  const labelIdentifiers = labels.map((label) => label.val);
-                  if (
-                    (labelIdentifiers.includes(rule.label) &&
-                      rule.access === "disallowed") ||
-                    (labelIdentifiers.includes(rule.label) === false &&
-                      rule.access === "allow")
-                  ) {
-                    allow = false;
-                  }
-                }
-              }
-            }
-
-            if (allow) {
-              const cmd = this.commandMap[commandPrompt.command];
-              if (cmd) {
-                console.log(
-                  `[reply] command received from ${reply.author.did}: ${reply.text} (${reply.uri})`
-                );
-
-                const t = this.getFixedT(
-                  reply.langs ? reply.langs : [],
-                  commandPrompt.command
-                );
-                const commandResult = await cmd.reply(commandPrompt, reply, t);
-              }
-            }
-          }
-        } catch (error) {
-          console.log(
-            `failed to fetch command prompt: ${JSON.stringify(error)}`
-          );
-        }
-      }
-    });
+    this.chatBot.on("open", this.botOpen.bind(this));
+    this.chatBot.on("close", this.botClose.bind(this));
+    this.chatBot.on("error", this.botError.bind(this));
+    this.chatBot.on("mention", this.botMention.bind(this));
+    this.chatBot.on("reply", this.botReply.bind(this));
 
     // start the server
 
-    this.server.set("view engine", "ejs");
-    this.server.set("views", __dirname + "/../views");
-
-    this.server.get("/health", (req, res) => {
-      res.json({ health: "ok" });
-    });
-
-    this.server.use(function (req, res) {
-      res.status(404).json({ error: "404" });
-    });
-
-    this.server.listen(this.options.port, () => {
-      console.log(`server listening on port ${this.options.port}`);
-    });
+    this.startServer();
   }
 }
