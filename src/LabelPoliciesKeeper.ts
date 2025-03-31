@@ -327,9 +327,7 @@ export class LabelPoliciesKeeper {
     res.render("pages/labels", this.getLabelsRouteRenderOptions(locales));
   }
 
-  async getTargetSelfServeLabels(
-    did: string
-  ): Promise<ComAtprotoLabelDefs.Label[]> {
+  async getTargetLabels(did: string): Promise<ComAtprotoLabelDefs.Label[]> {
     const profile = await this.blueskyCommunityBot.labelerBot.agent
       .get("app.bsky.actor.getProfile", {
         params: { actor: did },
@@ -344,19 +342,25 @@ export class LabelPoliciesKeeper {
         });
       });
 
+    return profile.data.labels ? profile.data.labels : [];
+  }
+
+  async getTargetSelfServeLabels(
+    did: string
+  ): Promise<ComAtprotoLabelDefs.Label[]> {
+    const labels = await this.getTargetLabels(did);
+
     const selfServeLabels: ComAtprotoLabelDefs.Label[] = [];
 
-    if (profile.data.labels) {
-      for (let i = 0; i < profile.data.labels.length; i++) {
-        const label = profile.data.labels[i];
-        if (
-          this.labelerPolicies.labelValues.includes(label.val) &&
-          this.blueskyCommunityBot.options.selfServeLabelIdentifiers.includes(
-            label.val
-          )
-        ) {
-          selfServeLabels.push(label);
-        }
+    for (let i = 0; i < labels.length; i++) {
+      const label = labels[i];
+      if (
+        this.labelerPolicies.labelValues.includes(label.val) &&
+        this.blueskyCommunityBot.options.selfServeLabelIdentifiers.includes(
+          label.val
+        )
+      ) {
+        selfServeLabels.push(label);
       }
     }
 

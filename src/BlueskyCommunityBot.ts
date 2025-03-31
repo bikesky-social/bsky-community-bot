@@ -199,8 +199,21 @@ export class BlueskyCommunityBot {
                 if (CommandPrompt.isDidListRule(rule)) {
                   if (rule.list.includes(reply.author.did) === false) {
                     allow = false;
+                  }
+                }
 
-                    // TODO: reply saying they aren't allowed to reply?
+                if (CommandPrompt.isLabelRule(rule)) {
+                  const labels = await this.labelPoliciesKeeper.getTargetLabels(
+                    reply.author.did
+                  );
+                  const labelIdentifiers = labels.map((label) => label.val);
+                  if (
+                    (labelIdentifiers.includes(rule.label) &&
+                      rule.access === "disallowed") ||
+                    (labelIdentifiers.includes(rule.label) === false &&
+                      rule.access === "allow")
+                  ) {
+                    allow = false;
                   }
                 }
               }

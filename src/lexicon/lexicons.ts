@@ -36,6 +36,7 @@ export const schemaDict = {
                 type: 'union',
                 refs: [
                   'lex:app.bikesky.communityBot.commandPrompt#didListRule',
+                  'lex:app.bikesky.communityBot.commandPrompt#labelRule',
                 ],
               },
             },
@@ -68,6 +69,25 @@ export const schemaDict = {
               type: 'string',
               format: 'did',
             },
+          },
+        },
+      },
+      labelRule: {
+        type: 'object',
+        description:
+          'Allow an actor to respond to the prompt if they have a label or if they do not have a label.',
+        required: ['label', 'access'],
+        properties: {
+          label: {
+            type: 'string',
+            description:
+              'The label identifier of the label to check for on the actor.',
+          },
+          access: {
+            type: 'string',
+            enum: ['allow', 'disallowed'],
+            description:
+              "If set to 'allow', the actor can use the command if they have the label. If set to 'disallow', the actor can use the command if they do not have the label.",
           },
         },
       },
