@@ -58,4 +58,18 @@ export class Env {
       return [];
     }
   }
+
+  static getOptionalJsonEnvVar(key: string) {
+    const jsonString = Env.getOptionalEnvVar(key);
+
+    if (jsonString) {
+      try {
+        return JSON.parse(jsonString);
+      } catch (error) {
+        throw `environment variable ${key} is not valid JSON`;
+      }
+    }
+
+    return undefined;
+  }
 }

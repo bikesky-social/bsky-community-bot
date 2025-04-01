@@ -9,6 +9,8 @@ describe("Env", () => {
     process.env.VALID_URI = "https://ozone.example.com";
     process.env.INVALID_URI = "ozone@example.com";
     process.env.CSV = "label1,label2,label3";
+    process.env.JSON = '{"health":"ok"}';
+    process.env.INVALID_JSON = "i am not valid json";
   });
 
   test("getRequiredStringEnvVarOrThrow throws if variable does not exist", () => {
@@ -64,11 +66,9 @@ describe("Env", () => {
   });
 
   test("getRequiredCommaSeparatedEnvVarOrThrow returns an array of values for a variable that exists", () => {
-    expect(Env.getRequiredCommaSeparatedEnvVarOrThrow("CSV")).toContainValues([
-      "label1",
-      "label2",
-      "label3",
-    ]);
+    const result = Env.getRequiredCommaSeparatedEnvVarOrThrow("CSV");
+    expect(result).toBeArray();
+    expect(result).toContainValues(["label1", "label2", "label3"]);
   });
 
   test("getRequiredCommaSeparatedEnvVarOrThrow throws if the variable does not exist", () => {
@@ -78,16 +78,30 @@ describe("Env", () => {
   });
 
   test("getOptionalCommaSeparatedEnvVar returns an array of values if it exists", () => {
-    expect(Env.getOptionalCommaSeparatedEnvVar("CSV")).toContainValues([
-      "label1",
-      "label2",
-      "label3",
-    ]);
+    const result = Env.getOptionalCommaSeparatedEnvVar("CSV");
+    expect(result).toBeArray();
+    expect(result).toContainValues(["label1", "label2", "label3"]);
   });
 
   test("getOptionalCommaSeparatedEnvVar returns an empty array if an environment variable does not exist", () => {
     expect(
       Env.getOptionalCommaSeparatedEnvVar("DOES_NOT_EXIST")
     ).toBeArrayOfSize(0);
+  });
+
+  test("getOptionalJsonEnvVar returns an object if the variable exists", () => {
+    const result = Env.getOptionalJsonEnvVar("JSON");
+    expect(result).toBeObject();
+    expect(result).toContainKey("health");
+  });
+
+  test("getOptionalJsonEnvVar throws if the variable is not valid json", () => {
+    expect(() => {
+      Env.getOptionalJsonEnvVar("INVALID_JSON");
+    }).toThrow("environment variable INVALID_JSON is not valid JSON");
+  });
+
+  test("getOptionalJsonEnvVar returns undefined if the variable does not exist",() => {
+    expect(Env.getOptionalJsonEnvVar("DOES_NOT_EXIST")).toBeUndefined();
   });
 });
