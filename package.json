@@ -48,7 +48,7 @@
     "build": "bun install",
     "start": "bun main.ts",
     "lexgen": "lex gen-server ./src/lexicon ./lexicons/*",
-    "test":"bun test"
+    "test": "bun test"
   },
   "devDependencies": {
     "@atproto/lex-cli": "^0.7.1",
