@@ -317,13 +317,6 @@ export class LabelPoliciesKeeper {
 
   async getLabelRoute(req: Request, res: Response) {
     const locales = req.query["locale"] ? [req.query["locale"] as string] : [];
-    const translate = this.blueskyCommunityBot.getFixedT(locales, "label");
-
-    let difference =
-      this.blueskyCommunityBot.options.selfServeLabelIdentifiers.filter(
-        (x) => !this.blueskyCommunityBot.options.verifiedLabels.includes(x)
-      );
-
     res.render("pages/labels", this.getLabelsRouteRenderOptions(locales));
   }
 
