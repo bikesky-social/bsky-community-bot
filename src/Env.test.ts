@@ -101,7 +101,25 @@ describe("Env", () => {
     }).toThrow("environment variable INVALID_JSON is not valid JSON");
   });
 
-  test("getOptionalJsonEnvVar returns undefined if the variable does not exist",() => {
+  test("getOptionalJsonEnvVar returns undefined if the variable does not exist", () => {
     expect(Env.getOptionalJsonEnvVar("DOES_NOT_EXIST")).toBeUndefined();
+  });
+
+  test("getRequiredJsonEnvVar throws if the variable does not exist", () => {
+    expect(() => {
+      Env.getRequiredJsonEnvVar("DOES_NOT_EXIST");
+    }).toThrow("required environment variable is not defined: DOES_NOT_EXIST");
+  });
+
+  test("getRequiredJsonEnvVar throws if the variable is not valid json", () => {
+    expect(() => {
+      Env.getRequiredJsonEnvVar("INVALID_JSON");
+    }).toThrow("environment variable INVALID_JSON is not valid JSON");
+  });
+
+  test("getRequiredJsonEnvVar returns an object if the variable exists", () => {
+    const result = Env.getRequiredJsonEnvVar("JSON");
+    expect(result).toBeObject();
+    expect(result).toContainKey("health");
   });
 });

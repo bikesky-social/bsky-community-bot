@@ -59,6 +59,16 @@ export class Env {
     }
   }
 
+  static getRequiredJsonEnvVar(key: string) {
+    const jsonString = Env.getRequiredStringEnvVarOrThrow(key);
+
+    try {
+      return JSON.parse(jsonString);
+    } catch (error) {
+      throw `environment variable ${key} is not valid JSON`;
+    }
+  }
+
   static getOptionalJsonEnvVar(key: string) {
     const jsonString = Env.getOptionalEnvVar(key);
 
