@@ -19,18 +19,23 @@ export class Env {
     const result = process.env[key];
 
     if (result) {
-      return Number(result);
+      if (isNaN(Number(result))) {
+        throw `required numeric environment variable is not a number: ${key}`;
+      } else {
+        return Number(result);
+      }
     } else {
       throw `required environment variable is not defined: ${key}`;
     }
   }
+
   static getRequiredUriEnvVarOrThrow(key: string) {
     const result = Env.getRequiredStringEnvVarOrThrow(key);
 
     if (validUrl.isUri(result)) {
       return result;
     } else {
-      throw `environment variable ${key} is not a valid URL. please enter a valid URL (eg. https://ozone.example.com)`;
+      throw `environment variable ${key} is not a valid URI. please enter a valid URI (eg. https://ozone.example.com)`;
     }
   }
 
@@ -39,9 +44,8 @@ export class Env {
 
     if (commaSeparatedString) {
       return commaSeparatedString.split(",");
-    }
-    else {
-        return [];
+    } else {
+      return [];
     }
   }
 
