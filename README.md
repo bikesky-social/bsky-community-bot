@@ -91,6 +91,7 @@ docker run -p 3000:3000 \
 -e SELF_SERVE_LABELS=[{"labels":[{"identifier":"label-1","verified":false},{"identifier":"label-2","verified":false},{"identifier":"label-3","verified":false},{"identifier":"label-4","verified":false}]},{"name":[{"lang":"en","value":"Verified Labels ✅"}],"showVerificationNote":true,"labels":[{"identifier":"label-5","verified":true},{"identifier":"label-6","verified":true}]}] \
 -e LABEL_VERIFICATION_EMAIL=replace_with_email_address \
 -e USE_LABEL_WEBPAGE=false \
+-e HOST_NAME=www.example.com \
 bikesky/bsky-community-bot
 ```
 
@@ -139,6 +140,7 @@ const bot = new BlueskyCommunityBot({
   ],
   labelVerificationEmail: "replace.this@example.com",
   useLabelWebpage: false,
+  hostName: "www.example.com",
 });
 
 bot.addCommands([
