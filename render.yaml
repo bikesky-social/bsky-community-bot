@@ -6,7 +6,7 @@ services:
     plan: free
     envVars:
       - key: BUN_VERSION
-        value: 1.2.4
+        value: 1.2.8
       - key: LABELER_BSKY_USERNAME
         sync: false
       - key: LABELER_BSKY_APP_PASSWORD
@@ -19,9 +19,9 @@ services:
         sync: false
       - key: MAX_LABELS
         sync: false
-      - key: SELF_SERVE_LABEL_IDENTIFIERS
+      - key: LABEL_DISPLAY_COLUMNS
         sync: false
-      - key: VERIFIED_LABELS
+      - key: SELF_SERVE_LABELS
         sync: false
       - key: LABEL_VERIFICATION_EMAIL
         sync: false
