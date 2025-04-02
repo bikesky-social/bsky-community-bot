@@ -111,8 +111,25 @@ const bot = new BlueskyCommunityBot({
   maxPostLength: 300,
   maxLabels: 3,
   labelDisplayColumns:2,
-  selfServeLabelIdentifiers: ["label-1","label-2","label-3","label-4"],
-  verifiedLabels: ["label-3","label-4"],
+  selfServeLabels: [
+    {
+      showVerificationNote: false,
+      labels: [
+        { identifier: "label-1", verified: false },
+        { identifier: "label-2", verified: false },
+        { identifier: "label-3", verified: false },
+        { identifier: "label-4", verified: false },
+      ],
+    },
+    {
+      name: [{ lang: "en", value: "Verified Labels ✅" }],
+      showVerificationNote: true,
+      labels: [
+        { identifier: "label-5", verified: true },
+        { identifier: "label-6", verified: true },
+      ],
+    },
+  ],
   labelVerificationEmail: "replace.this@example.com",
 });
 
