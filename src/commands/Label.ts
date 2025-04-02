@@ -97,8 +97,9 @@ export class LabelCommand extends Command {
       this.blueskyCommunityBot.options.maxPostLength - emptyPost.length;
 
     // generate random label examples
-    const rndSelfServeIdentifiers =
-      this.blueskyCommunityBot.options.selfServeLabelIdentifiers.map((x) => x);
+    const rndSelfServeIdentifiers = this.blueskyCommunityBot.labelPoliciesKeeper
+      .getSelfServeLabelIdentifiers()
+      .map((x) => x);
 
     rndSelfServeIdentifiers.sort(() => Math.random() - 0.5);
 
@@ -171,8 +172,8 @@ export class LabelCommand extends Command {
     // save the command prompt record
     await this.createLabelPromptRecord(
       replyRef,
-      this.blueskyCommunityBot.options.selfServeLabelIdentifiers,
-      this.blueskyCommunityBot.options.verifiedLabels
+      this.blueskyCommunityBot.labelPoliciesKeeper.getSelfServeLabelIdentifiers(),
+      this.blueskyCommunityBot.labelPoliciesKeeper.getVerifiedSelfServeLabelIdentifiers()
     );
   }
 
@@ -190,11 +191,11 @@ export class LabelCommand extends Command {
 
       if (
         arrayEqual(
-          this.blueskyCommunityBot.options.selfServeLabelIdentifiers,
+          this.blueskyCommunityBot.labelPoliciesKeeper.getSelfServeLabelIdentifiers(),
           labelPrompt.labelIdentifiers
         ) === false ||
         arrayEqual(
-          this.blueskyCommunityBot.options.verifiedLabels,
+          this.blueskyCommunityBot.labelPoliciesKeeper.getVerifiedSelfServeLabelIdentifiers(),
           labelPrompt.verifiedLabelIdentifiers
         ) === false
       ) {
@@ -211,7 +212,7 @@ export class LabelCommand extends Command {
       }
 
       const maxChoice =
-        this.blueskyCommunityBot.options.selfServeLabelIdentifiers.length;
+        this.blueskyCommunityBot.labelPoliciesKeeper.getSelfServeLabelIdentifiers().length;
 
       const indexList: number[] = [];
       reply.text
@@ -269,7 +270,7 @@ export class LabelCommand extends Command {
             for (let j = 0; j < selfServeLabels.length; j++) {
               const selfServeLabelIdentifier = selfServeLabels[j].val;
               if (
-                this.blueskyCommunityBot.options.selfServeLabelIdentifiers[
+                this.blueskyCommunityBot.labelPoliciesKeeper.getSelfServeLabelIdentifiers()[
                   labelIndex - 1
                 ] === selfServeLabelIdentifier
               ) {
@@ -335,14 +336,14 @@ export class LabelCommand extends Command {
       for (let i = 0; i < indexList.length; i++) {
         const labelIndex = indexList[i] - 1;
         const labelIdentifier =
-          this.blueskyCommunityBot.options.selfServeLabelIdentifiers[
+          this.blueskyCommunityBot.labelPoliciesKeeper.getSelfServeLabelIdentifiers()[
             labelIndex
           ];
 
         if (
-          this.blueskyCommunityBot.options.verifiedLabels.includes(
-            labelIdentifier
-          )
+          this.blueskyCommunityBot.labelPoliciesKeeper
+            .getVerifiedSelfServeLabelIdentifiers()
+            .includes(labelIdentifier)
         ) {
           labelsAwaitingVerification.push(labelIdentifier);
         } else {

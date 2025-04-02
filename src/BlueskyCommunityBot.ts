@@ -9,6 +9,22 @@ import Backend from "i18next-fs-backend";
 const fs = require("fs");
 import * as BskyCommunityBotLexicons from "./lexicon/lexicons";
 
+export type SelfServeLabel = {
+  identifier: string;
+  verified: boolean;
+};
+
+export type CategoryName = {
+  lang: string;
+  value: string;
+};
+
+export type LabelCategory = {
+  name?: CategoryName[];
+  showVerificationNote: boolean;
+  labels: SelfServeLabel[];
+};
+
 type BlueskyCommunityBotOptions = {
   labelerBskyUsername: string;
   labelerBskyAppPassword: string;
@@ -17,8 +33,7 @@ type BlueskyCommunityBotOptions = {
   maxPostLength: number;
   maxLabels: number;
   labelDisplayColumns: number;
-  selfServeLabelIdentifiers: string[];
-  verifiedLabels: string[];
+  selfServeLabels: LabelCategory[];
   labelVerificationEmail?: string;
   devChatBotBskyUsername?: string;
   devChatBotBskyAppPassword?: string;

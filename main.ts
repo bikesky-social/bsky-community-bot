@@ -12,8 +12,7 @@ const bot = new BlueskyCommunityBot({
   maxPostLength: Env.getRequiredNumberEnvVarOrThrow("MAX_POST_LENGTH"),
   maxLabels: Env.getRequiredNumberEnvVarOrThrow("MAX_LABELS"),
   labelDisplayColumns: Env.getRequiredNumberEnvVarOrThrow("LABEL_DISPLAY_COLUMNS"),
-  selfServeLabelIdentifiers: Env.getRequiredCommaSeparatedEnvVarOrThrow("SELF_SERVE_LABEL_IDENTIFIERS"),
-  verifiedLabels: Env.getOptionalCommaSeparatedEnvVar("VERIFIED_LABELS"),
+  selfServeLabels: Env.getRequiredJsonEnvVar("SELF_SERVE_LABELS"),
   labelVerificationEmail: Env.getOptionalEnvVar("LABEL_VERIFICATION_EMAIL"),
   devChatBotBskyUsername: Env.getOptionalEnvVar("DEV_CHATBOT_BSKY_USERNAME"),
   devChatBotBskyAppPassword: Env.getOptionalEnvVar("DEV_CHATBOT_BSKY_APP_PASSWORD")

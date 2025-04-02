@@ -49,20 +49,30 @@ export class LabelPoliciesKeeper {
     await this.updateLabelPolicies();
   }
 
-  getLabelIdentifiersCommaSeparatedString() {
-    return this.labelerPolicies.labelValues.join(",");
+  getSelfServeLabelIdentifiers() {
+    return this.blueskyCommunityBot.options.selfServeLabels
+      .map((category) => category.labels)
+      .flat()
+      .map((label) => label.identifier);
+  }
+
+  getVerifiedSelfServeLabelIdentifiers() {
+    return this.blueskyCommunityBot.options.selfServeLabels
+      .map((category) => category.labels)
+      .flat()
+      .filter((label) => label.verified === true)
+      .map((label) => label.identifier);
   }
 
   validateSelfServeLabels(): boolean {
     // ensure self serve labels are in label defs
-    const labelsNotFoundInDefs =
-      this.blueskyCommunityBot.options.selfServeLabelIdentifiers.filter(
-        (x) => !this.labelerPolicies.labelValues.includes(x)
-      );
+    const labelsNotFoundInDefs = this.getSelfServeLabelIdentifiers().filter(
+      (x) => !this.labelerPolicies.labelValues.includes(x)
+    );
 
     if (labelsNotFoundInDefs.length === 0) {
       console.log(
-        `self serve labels validated (${this.blueskyCommunityBot.options.selfServeLabelIdentifiers.length})`
+        `self serve labels validated (${this.getSelfServeLabelIdentifiers().length})`
       );
       return true;
     }
@@ -71,42 +81,6 @@ export class LabelPoliciesKeeper {
       `self serve labels could not be validated. ${labelsNotFoundInDefs.length} identifiers not found in label defs: ${labelsNotFoundInDefs}`
     );
     return false;
-  }
-
-  validateVerifiedLabels(): boolean {
-    // ensure verified labels are in label defs
-    const labelsNotFoundInDefs =
-      this.blueskyCommunityBot.options.verifiedLabels.filter(
-        (x) => !this.labelerPolicies.labelValues.includes(x)
-      );
-
-    if (labelsNotFoundInDefs.length != 0) {
-      console.log(
-        `verified labels could not be validated. ${labelsNotFoundInDefs.length} identifiers could not be found in the labeler's label defs: ${labelsNotFoundInDefs}`
-      );
-      return false;
-    }
-
-    // ensure verified labels are in the list of self serve labels
-    const labelsNotFoundInSelfServeLabelIdentifiers =
-      this.blueskyCommunityBot.options.verifiedLabels.filter(
-        (x) =>
-          !this.blueskyCommunityBot.options.selfServeLabelIdentifiers.includes(
-            x
-          )
-      );
-
-    if (labelsNotFoundInSelfServeLabelIdentifiers.length != 0) {
-      console.log(
-        `verified labels could not be validated. ${labelsNotFoundInSelfServeLabelIdentifiers.length} identifiers could not be found in self serve label identifiers: ${labelsNotFoundInSelfServeLabelIdentifiers}`
-      );
-      return false;
-    }
-
-    console.log(
-      `verified labels validated (${this.blueskyCommunityBot.options.verifiedLabels.length})`
-    );
-    return true;
   }
 
   async updateLabelPolicies(): Promise<boolean> {
@@ -139,7 +113,7 @@ export class LabelPoliciesKeeper {
 
         console.log("updated label defs");
 
-        if (this.validateSelfServeLabels() && this.validateVerifiedLabels()) {
+        if (this.validateSelfServeLabels()) {
           this.hasValidSelfServeLabels = true;
         }
 
@@ -158,25 +132,6 @@ export class LabelPoliciesKeeper {
     const result = await this.updateLabelPolicies();
 
     res.send({ result: result ? "success" : "failed" });
-  }
-
-  dataURItoBlob(dataURI: string) {
-    // convert base64/URLEncoded data component to raw binary data held in a string
-    var byteString;
-    if (dataURI.split(",")[0].indexOf("base64") >= 0)
-      byteString = atob(dataURI.split(",")[1]);
-    else byteString = unescape(dataURI.split(",")[1]);
-
-    // separate out the mime component
-    var mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
-
-    // write the bytes of the string to a typed array
-    var ia = new Uint8Array(byteString.length);
-    for (var i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
-    }
-
-    return new Blob([ia], { type: mimeString });
   }
 
   getLabelOptionsImagePayloadCacheKey(locales: string[]) {
@@ -202,20 +157,15 @@ export class LabelPoliciesKeeper {
     });
 
     if (this.labelerPolicies.labelValueDefinitions) {
-      for (
-        let i = 0;
-        i < this.blueskyCommunityBot.options.selfServeLabelIdentifiers.length;
-        i++
-      ) {
-        const labelIdentifier =
-          this.blueskyCommunityBot.options.selfServeLabelIdentifiers[i];
+      const selfServeLabelIdentifiers = this.getSelfServeLabelIdentifiers();
+      for (let i = 0; i < selfServeLabelIdentifiers.length; i++) {
+        const labelIdentifier = selfServeLabelIdentifiers[i];
 
-        const labelText =
-          this.blueskyCommunityBot.options.verifiedLabels.includes(
-            labelIdentifier
-          )
-            ? `${this.getLabelName(labelIdentifier, locales)}*`
-            : this.getLabelName(labelIdentifier, locales);
+        const labelText = this.getVerifiedSelfServeLabelIdentifiers().includes(
+          labelIdentifier
+        )
+          ? `${this.getLabelName(labelIdentifier, locales)}*`
+          : this.getLabelName(labelIdentifier, locales);
         const labelName = `${i + 1}. ${labelText}`;
 
         altText = altText.concat(`\n${labelName}`);
@@ -228,21 +178,11 @@ export class LabelPoliciesKeeper {
   getLabelsRouteRenderOptions(locales: string[]) {
     const translate = this.blueskyCommunityBot.getFixedT(locales, "label");
 
-    let difference =
-      this.blueskyCommunityBot.options.selfServeLabelIdentifiers.filter(
-        (x) => !this.blueskyCommunityBot.options.verifiedLabels.includes(x)
-      );
-
     return {
       labelerAvatarUrl: this.blueskyCommunityBot.labelerBot.profile.avatar,
       labelerDisplayName:
         this.blueskyCommunityBot.labelerBot.profile.displayName,
-      selfServeLabelNames: this.getLabelNames(difference, locales),
-      selfServeVerifiedLabelNames: this.getLabelNames(
-        this.blueskyCommunityBot.options.verifiedLabels,
-        locales
-      ),
-      verifiedLabelsHeading: translate("webpage.verifiedLabelsHeading"),
+      selfServeLabels: this.getSelfServeLabelsForDisplay(locales),
       manualVerificationNotice: translate("webpage.manualVerificationNotice"),
       columns: this.blueskyCommunityBot.options.labelDisplayColumns,
     };
@@ -349,9 +289,7 @@ export class LabelPoliciesKeeper {
       const label = labels[i];
       if (
         this.labelerPolicies.labelValues.includes(label.val) &&
-        this.blueskyCommunityBot.options.selfServeLabelIdentifiers.includes(
-          label.val
-        )
+        this.getSelfServeLabelIdentifiers().includes(label.val)
       ) {
         selfServeLabels.push(label);
       }
@@ -432,5 +370,40 @@ export class LabelPoliciesKeeper {
     }
 
     return labelNames;
+  }
+
+  getSelfServeLabelsForDisplay(locales: string[]) {
+    const desiredLocales = locales.concat([
+      this.blueskyCommunityBot.options.defaultLocale,
+    ]);
+
+    const displayLabels: {}[] = [];
+
+    this.blueskyCommunityBot.options.selfServeLabels.map((category) => {
+      const newCategory = {
+        name: "",
+        showVerificationNote: category.showVerificationNote,
+        labels: this.getLabelNames(
+          category.labels.map((label) => label.identifier),
+          locales
+        ),
+      };
+
+      if (category.name) {
+        const nameLocales = category.name.map((name) => name.lang);
+        for (let i = 0; i < desiredLocales.length; i++) {
+          const locale = desiredLocales[i];
+          const localeIndex = nameLocales.indexOf(locale);
+          if (localeIndex != -1) {
+            newCategory.name = category.name[localeIndex].value;
+            break;
+          }
+        }
+      }
+
+      displayLabels.push(newCategory);
+    });
+
+    return displayLabels;
   }
 }
