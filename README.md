@@ -81,8 +81,7 @@ docker run -p 3000:3000 \
 -e MAX_POST_LENGTH=300 \
 -e MAX_LABELS=3 \
 -e LABEL_DISPLAY_COLUMNS=2 \
--e SELF_SERVE_LABEL_IDENTIFIERS=label-1,label-2,label-3,label-4 \
--e VERIFIED_LABELS=label-3,label-4 \
+-e SELF_SERVE_LABELS=[{"labels":[{"identifier":"label-1","verified":false},{"identifier":"label-2","verified":false},{"identifier":"label-3","verified":false},{"identifier":"label-4","verified":false}]},{"name":[{"lang":"en","value":"Verified Labels ✅"}],"showVerificationNote":true,"labels":[{"identifier":"label-5","verified":true},{"identifier":"label-6","verified":true}]}] \
 -e LABEL_VERIFICATION_EMAIL=replace_with_email_address \
 bikesky/bsky-community-bot
 ```
