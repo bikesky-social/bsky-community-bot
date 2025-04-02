@@ -61,7 +61,7 @@ LABEL_VERIFICATION_EMAIL=replace_with_email_address
 # if false, the bot will reply to the label command with an image showing a list of labels
 USE_LABEL_WEBPAGE=false
 
-# the domain where your bot is hosted (required if USE_LABEL_WEBPAGE is true)
+# the publicly accessible domain where your bot is hosted (required if USE_LABEL_WEBPAGE is true)
 HOST_NAME=www.example.com
 ```
 
