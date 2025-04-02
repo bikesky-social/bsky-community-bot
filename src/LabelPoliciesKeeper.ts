@@ -18,12 +18,16 @@ type LabelOptionsImagePayload = {
 export class LabelPoliciesKeeper {
   readonly blueskyCommunityBot: BlueskyCommunityBot;
   readonly labelsRoute = "/labels";
+  readonly labelsOgImageRoute = "/labels-ogimage";
   labelerPolicies: LabelerPolicies = {
     labelValues: [],
     labelValueDefinitions: [],
   };
   hasValidSelfServeLabels: boolean = false;
   labelOptionsImagePayloadCache: {
+    [locale: string]: LabelOptionsImagePayload;
+  } = {};
+  labelsOgImagePayloadCache: {
     [locale: string]: LabelOptionsImagePayload;
   } = {};
 
@@ -45,6 +49,11 @@ export class LabelPoliciesKeeper {
     this.blueskyCommunityBot.server.get(
       this.labelsRoute,
       this.getLabelRoute.bind(this)
+    );
+
+    this.blueskyCommunityBot.server.get(
+      this.labelsOgImageRoute,
+      this.getLabelsOgImageRoute.bind(this)
     );
 
     await this.updateLabelPolicies();
@@ -72,6 +81,14 @@ export class LabelPoliciesKeeper {
       this.labelsRoute +
       "?locale=" +
       locale
+    );
+  }
+
+  getLabelsOgImageUrl() {
+    return (
+      "https://" +
+      this.blueskyCommunityBot.options.hostName +
+      this.labelsOgImageRoute
     );
   }
 
@@ -158,6 +175,15 @@ export class LabelPoliciesKeeper {
     return undefined;
   }
 
+  getCachedLabelsOgImagePayload(locales: string[]) {
+    const key = this.getLabelOptionsImagePayloadCacheKey(locales);
+    if (key in this.labelsOgImagePayloadCache) {
+      return this.labelsOgImagePayloadCache[key];
+    }
+
+    return undefined;
+  }
+
   getLabelOptionsImageAltText(locales: string[]) {
     let altText = "";
 
@@ -196,6 +222,8 @@ export class LabelPoliciesKeeper {
       selfServeLabels: this.getSelfServeLabelsForDisplay(locales),
       manualVerificationNotice: translate("webpage.manualVerificationNotice"),
       columns: this.blueskyCommunityBot.options.labelDisplayColumns,
+      showOgImage: this.blueskyCommunityBot.options.useLabelWebpage,
+      ogImageUrl: this.getLabelsOgImageUrl(),
     };
   }
 
@@ -258,6 +286,58 @@ export class LabelPoliciesKeeper {
     return payload;
   }
 
+  async getLabelsOgImagePayload(
+    locales: string[]
+  ): Promise<LabelOptionsImagePayload> {
+    const cache = this.getCachedLabelsOgImagePayload(locales);
+    if (cache) {
+      return cache;
+    }
+
+    const renderOptions = {};
+
+    const browser = await chromium.launch();
+    const page = await browser.newPage();
+
+    let labelHtml = "";
+
+    this.blueskyCommunityBot.server.render(
+      "pages/labels-ogimage",
+      renderOptions,
+      (error, html) => {
+        labelHtml = html;
+      }
+    );
+
+    await page.setContent(labelHtml, { waitUntil: "load" });
+
+    await page.setViewportSize({
+      width: 1200,
+      height: 630,
+    });
+
+    const buffer = await page.screenshot({
+      type: "png",
+      scale: "device",
+    });
+    await browser.close();
+
+    const payload: LabelOptionsImagePayload = {
+      imageBuffer: buffer,
+      imageBlob: new Blob([buffer], { type: "image/png" }),
+      imageDimensions: imageSize(buffer),
+      altText: this.getLabelOptionsImageAltText(locales),
+    };
+
+    this.labelsOgImagePayloadCache[
+      this.getLabelOptionsImagePayloadCacheKey(locales)
+    ] = payload;
+
+    console.log(`generated labels-ogimage for locales: ${locales}`);
+
+    return payload;
+  }
+
   async getLabelImageRoute(req: Request, res: Response) {
     const imageOptionsPayload = await this.getLabelOptionsImagePayload(
       req.query["locale"] ? [req.query["locale"] as string] : []
@@ -269,6 +349,14 @@ export class LabelPoliciesKeeper {
   async getLabelRoute(req: Request, res: Response) {
     const locales = req.query["locale"] ? [req.query["locale"] as string] : [];
     res.render("pages/labels", this.getLabelsRouteRenderOptions(locales));
+  }
+
+  async getLabelsOgImageRoute(req: Request, res: Response) {
+    const imageOptionsPayload = await this.getLabelsOgImagePayload(
+      req.query["locale"] ? [req.query["locale"] as string] : []
+    );
+    res.type("png");
+    res.end(imageOptionsPayload.imageBuffer);
   }
 
   async getTargetLabels(did: string): Promise<ComAtprotoLabelDefs.Label[]> {

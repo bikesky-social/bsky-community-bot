@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title><%= labelerDisplayName %></title>
+  <% if (showOgImage === true) { %>
+  <meta property="og:image" content="<%= ogImageUrl %>"/>
+  <% } %>
   <style>
     <%- include('../partials/styles.css'); %>
   </style>
