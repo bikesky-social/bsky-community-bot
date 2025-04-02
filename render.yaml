@@ -25,6 +25,10 @@ services:
         sync: false
       - key: LABEL_VERIFICATION_EMAIL
         sync: false
+      - key: USE_LABEL_WEBPAGE
+        sync: false
+      - key: HOST_NAME
+        sync: false
     buildCommand: bun i --frozen-lockfile
     startCommand: bun run start
     healthCheckPath: /health

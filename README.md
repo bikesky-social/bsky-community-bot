@@ -46,7 +46,7 @@ MAX_POST_LENGTH=300
 # set this to -1 for unlimited labels
 MAX_LABELS=3
 
-# the number of columns to display on the label image
+# the number of columns to display on the label image (required)
 LABEL_DISPLAY_COLUMNS=2
 
 # a JSON formatted array that lists the identifiers of the labels that the bot will offer (required)
@@ -54,8 +54,15 @@ LABEL_DISPLAY_COLUMNS=2
 # category objects can be named with localized values and optionally show a notice that says labels in that category require manual verification
 SELF_SERVE_LABELS=[{"labels":[{"identifier":"label-1","verified":false},{"identifier":"label-2","verified":false},{"identifier":"label-3","verified":false},{"identifier":"label-4","verified":false}]},{"name":[{"lang":"en","value":"Verified Labels ✅"}],"showVerificationNote":true,"labels":[{"identifier":"label-5","verified":true},{"identifier":"label-6","verified":true}]}]
 
-# an email address that the bot will tell people to contact if they ask for a verified label (required if VERIFIED_LABELS are specified)
+# an email address that the bot will tell people to contact if they ask for a verified label (required if any labels are set to verified:true)
 LABEL_VERIFICATION_EMAIL=replace_with_email_address
+
+# if true, the bot will link people who use the label command to a webpage where it hosts a list of labels (required)
+# if false, the bot will reply to the label command with an image showing a list of labels
+USE_LABEL_WEBPAGE=false
+
+# the domain where your bot is hosted (required if USE_LABEL_WEBPAGE is true)
+HOST_NAME=www.example.com
 ```
 
 ## Deploying
@@ -83,6 +90,7 @@ docker run -p 3000:3000 \
 -e LABEL_DISPLAY_COLUMNS=2 \
 -e SELF_SERVE_LABELS=[{"labels":[{"identifier":"label-1","verified":false},{"identifier":"label-2","verified":false},{"identifier":"label-3","verified":false},{"identifier":"label-4","verified":false}]},{"name":[{"lang":"en","value":"Verified Labels ✅"}],"showVerificationNote":true,"labels":[{"identifier":"label-5","verified":true},{"identifier":"label-6","verified":true}]}] \
 -e LABEL_VERIFICATION_EMAIL=replace_with_email_address \
+-e USE_LABEL_WEBPAGE=false \
 bikesky/bsky-community-bot
 ```
 
@@ -130,6 +138,7 @@ const bot = new BlueskyCommunityBot({
     },
   ],
   labelVerificationEmail: "replace.this@example.com",
+  useLabelWebpage: false,
 });
 
 bot.addCommands([
