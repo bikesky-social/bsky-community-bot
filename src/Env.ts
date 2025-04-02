@@ -82,4 +82,16 @@ export class Env {
 
     return undefined;
   }
+
+  static getRequiredBooleanEnvVar(key: string) {
+    const string = Env.getRequiredStringEnvVarOrThrow(key);
+
+    if (string.toLowerCase() === "true") {
+      return true;
+    } else if (string.toLowerCase() === "false") {
+      return false;
+    } else {
+      throw `environment variable ${key} is not a valid boolean. expected 'true' or 'false'`;
+    }
+  }
 }

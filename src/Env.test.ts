@@ -11,6 +11,9 @@ describe("Env", () => {
     process.env.CSV = "label1,label2,label3";
     process.env.JSON = '{"health":"ok"}';
     process.env.INVALID_JSON = "i am not valid json";
+    process.env.BOOLEAN_TRUE = "true";
+    process.env.BOOLEAN_FALSE = "false";
+    process.env.BOOLEAN_INVALID = "i am not a valid boolean";
   });
 
   test("getRequiredStringEnvVarOrThrow throws if variable does not exist", () => {
@@ -121,5 +124,27 @@ describe("Env", () => {
     const result = Env.getRequiredJsonEnvVar("JSON");
     expect(result).toBeObject();
     expect(result).toContainKey("health");
+  });
+
+  test("getRequiredBooleanEnvVar returns true for an env var that is set to true", () => {
+    expect(Env.getRequiredBooleanEnvVar("BOOLEAN_TRUE")).toBe(true);
+  });
+
+  test("getRequiredBooleanEnvVar returns false for an env var that is set to false", () => {
+    expect(Env.getRequiredBooleanEnvVar("BOOLEAN_FALSE")).toBe(false);
+  });
+
+  test("getRequiredBooleanEnvVar throws for an env var that is not a valid boolean", () => {
+    expect(() => {
+      Env.getRequiredBooleanEnvVar("BOOLEAN_INVALID");
+    }).toThrow(
+      "environment variable BOOLEAN_INVALID is not a valid boolean. expected 'true' or 'false'"
+    );
+  });
+
+  test("getRequiredBooleanEnvVar to throw if the env var does not exist", () => {
+    expect(() => {
+      Env.getRequiredBooleanEnvVar("DOES_NOT_EXIST");
+    }).toThrow("required environment variable is not defined: DOES_NOT_EXIST");
   });
 });
