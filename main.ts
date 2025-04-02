@@ -4,6 +4,9 @@ import { LabelCommand } from "./src/commands/Label";
 import { UnlabelCommand } from "./src/commands/Unlabel";
 import { Env } from "./src/Env";
 
+const useLabelWebpage = Env.getRequiredBooleanEnvVar("USE_LABEL_WEBPAGE");
+const hostName = useLabelWebpage ? Env.getRequiredStringEnvVarOrThrow("HOST_NAME") : Env.getOptionalEnvVar("HOST_NAME");
+
 const bot = new BlueskyCommunityBot({
   labelerBskyUsername: Env.getRequiredStringEnvVarOrThrow("LABELER_BSKY_USERNAME"),
   labelerBskyAppPassword: Env.getRequiredStringEnvVarOrThrow("LABELER_BSKY_APP_PASSWORD"),
@@ -14,6 +17,8 @@ const bot = new BlueskyCommunityBot({
   labelDisplayColumns: Env.getRequiredNumberEnvVarOrThrow("LABEL_DISPLAY_COLUMNS"),
   selfServeLabels: Env.getRequiredJsonEnvVar("SELF_SERVE_LABELS"),
   labelVerificationEmail: Env.getOptionalEnvVar("LABEL_VERIFICATION_EMAIL"),
+  useLabelWebpage: useLabelWebpage,
+  hostName: hostName,
   devChatBotBskyUsername: Env.getOptionalEnvVar("DEV_CHATBOT_BSKY_USERNAME"),
   devChatBotBskyAppPassword: Env.getOptionalEnvVar("DEV_CHATBOT_BSKY_APP_PASSWORD")
 });

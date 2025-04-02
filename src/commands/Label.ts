@@ -1,5 +1,5 @@
 import { Command } from "./Command";
-import { Post, PostReference } from "@skyware/bot";
+import { Post, PostReference, type PostPayload } from "@skyware/bot";
 import { BlueskyCommunityBot } from "../BlueskyCommunityBot";
 import type { TFunction } from "i18next";
 
@@ -147,16 +147,24 @@ export class LabelCommand extends Command {
         numberList: exampleIndexes.join(","),
       });
 
-    // fetch the image payload
-    const imagePayload =
-      await this.blueskyCommunityBot.labelPoliciesKeeper.getLabelOptionsImagePayload(
-        locales
-      );
+    const postLocale = translate("post.intro", { returnDetails: true }).usedLng;
 
-    // post
-    const replyRef = await post.reply({
+    const replyPayload: PostPayload = {
       text: postText,
-      images: [
+      langs: [postLocale],
+    };
+
+    if (this.blueskyCommunityBot.options.useLabelWebpage) {
+      replyPayload.external =
+        this.blueskyCommunityBot.labelPoliciesKeeper.getLabelsUrl(postLocale);
+    } else {
+      // fetch the image payload
+      const imagePayload =
+        await this.blueskyCommunityBot.labelPoliciesKeeper.getLabelOptionsImagePayload(
+          locales
+        );
+
+      replyPayload.images = [
         {
           data: imagePayload.imageBlob,
           aspectRatio: {
@@ -165,9 +173,11 @@ export class LabelCommand extends Command {
           },
           alt: imagePayload.altText,
         },
-      ],
-      langs: [translate("post.intro", { returnDetails: true }).usedLng],
-    });
+      ];
+    }
+
+    // post
+    const replyRef = await post.reply(replyPayload);
 
     // save the command prompt record
     await this.createLabelPromptRecord(
@@ -212,7 +222,8 @@ export class LabelCommand extends Command {
       }
 
       const maxChoice =
-        this.blueskyCommunityBot.labelPoliciesKeeper.getSelfServeLabelIdentifiers().length;
+        this.blueskyCommunityBot.labelPoliciesKeeper.getSelfServeLabelIdentifiers()
+          .length;
 
       const indexList: number[] = [];
       reply.text

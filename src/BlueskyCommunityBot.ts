@@ -35,6 +35,8 @@ type BlueskyCommunityBotOptions = {
   labelDisplayColumns: number;
   selfServeLabels: LabelCategory[];
   labelVerificationEmail?: string;
+  useLabelWebpage: boolean;
+  hostName?: string;
   devChatBotBskyUsername?: string;
   devChatBotBskyAppPassword?: string;
 };

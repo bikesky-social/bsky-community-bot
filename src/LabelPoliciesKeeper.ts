@@ -17,6 +17,7 @@ type LabelOptionsImagePayload = {
 
 export class LabelPoliciesKeeper {
   readonly blueskyCommunityBot: BlueskyCommunityBot;
+  readonly labelsRoute = "/labels";
   labelerPolicies: LabelerPolicies = {
     labelValues: [],
     labelValueDefinitions: [],
@@ -42,7 +43,7 @@ export class LabelPoliciesKeeper {
     );
 
     this.blueskyCommunityBot.server.get(
-      "/labels",
+      this.labelsRoute,
       this.getLabelRoute.bind(this)
     );
 
@@ -62,6 +63,16 @@ export class LabelPoliciesKeeper {
       .flat()
       .filter((label) => label.verified === true)
       .map((label) => label.identifier);
+  }
+
+  getLabelsUrl(locale: string) {
+    return (
+      "https://" +
+      this.blueskyCommunityBot.options.hostName +
+      this.labelsRoute +
+      "?locale=" +
+      locale
+    );
   }
 
   validateSelfServeLabels(): boolean {
