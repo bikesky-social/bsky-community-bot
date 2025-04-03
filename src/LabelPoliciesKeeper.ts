@@ -294,8 +294,6 @@ export class LabelPoliciesKeeper {
       return cache;
     }
 
-    const renderOptions = {};
-
     const browser = await chromium.launch();
     const page = await browser.newPage();
 
@@ -303,7 +301,11 @@ export class LabelPoliciesKeeper {
 
     this.blueskyCommunityBot.server.render(
       "pages/labels-ogimage",
-      renderOptions,
+      {
+        labelerAvatarUrl: this.blueskyCommunityBot.labelerBot.profile.avatar,
+        labelerDisplayName:
+          this.blueskyCommunityBot.labelerBot.profile.displayName,
+      },
       (error, html) => {
         labelHtml = html;
       }
