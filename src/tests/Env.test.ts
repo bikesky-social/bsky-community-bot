@@ -1,5 +1,5 @@
 import { expect, test, describe, beforeAll } from "bun:test";
-import { Env } from "./Env";
+import { Env } from "../Env";
 
 describe("Env", () => {
   beforeAll(() => {
