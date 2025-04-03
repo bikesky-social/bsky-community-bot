@@ -106,12 +106,6 @@ export class BlueskyCommunityBot {
     return this.i18n.getFixedT(lngsWithFallback, namespace);
   }
 
-  getCommandRecordKeyFromPost(post: Post) {
-    return post.replyRef
-      ? `${post.replyRef.root.cid}.${post.author.did}`
-      : `${post.cid}.${post.author.did}`;
-  }
-
   initi18next() {
     const localesDir = __dirname + "/../locales";
     this.i18n.init({
