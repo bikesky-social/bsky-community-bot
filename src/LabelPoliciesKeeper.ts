@@ -37,11 +37,6 @@ export class LabelPoliciesKeeper {
 
   async init() {
     this.blueskyCommunityBot.server.get(
-      "/update-label-policies",
-      this.updateLabelDefsRoute.bind(this)
-    );
-
-    this.blueskyCommunityBot.server.get(
       "/get-label-image",
       this.getLabelImageRoute.bind(this)
     );
@@ -54,6 +49,11 @@ export class LabelPoliciesKeeper {
     this.blueskyCommunityBot.server.get(
       this.labelsOgImageRoute,
       this.getLabelsOgImageRoute.bind(this)
+    );
+
+    this.blueskyCommunityBot.server.get(
+      "/clear-cache",
+      this.clearCaches.bind(this)
     );
 
     await this.updateLabelPolicies();
@@ -156,10 +156,11 @@ export class LabelPoliciesKeeper {
     }
   }
 
-  async updateLabelDefsRoute(req: Request, res: Response) {
-    const result = await this.updateLabelPolicies();
-
-    res.send({ result: result ? "success" : "failed" });
+  clearCaches(req: Request, res: Response) {
+    this.labelOptionsImagePayloadCache = {};
+    this.labelsOgImagePayloadCache = {};
+    console.log("caches cleared");
+    res.json({ status: "done" });
   }
 
   getLabelOptionsImagePayloadCacheKey(locales: string[]) {
