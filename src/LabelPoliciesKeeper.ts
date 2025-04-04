@@ -51,11 +51,6 @@ export class LabelPoliciesKeeper {
       this.getLabelsOgImageRoute.bind(this)
     );
 
-    this.blueskyCommunityBot.server.get(
-      "/clear-cache",
-      this.clearCaches.bind(this)
-    );
-
     await this.updateLabelPolicies();
   }
 
@@ -154,13 +149,6 @@ export class LabelPoliciesKeeper {
     } catch (error) {
       return false;
     }
-  }
-
-  clearCaches(req: Request, res: Response) {
-    this.labelOptionsImagePayloadCache = {};
-    this.labelsOgImagePayloadCache = {};
-    console.log("caches cleared");
-    res.json({ status: "done" });
   }
 
   getLabelOptionsImagePayloadCacheKey(locales: string[]) {
