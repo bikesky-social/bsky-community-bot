@@ -3,7 +3,7 @@ services:
     name: bsky community bot
     runtime: node
     autoDeploy: true
-    plan: free
+    plan: starter
     envVars:
       - key: BUN_VERSION
         value: 1.2.8
