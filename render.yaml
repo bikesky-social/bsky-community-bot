@@ -1,7 +1,9 @@
 services:
   - type: web
     name: bsky community bot
-    runtime: docker
+    runtime: image
+    image:
+      url: docker.io/bikesky/bsky-community-bot:latest
     autoDeploy: true
     plan: free
     envVars:
