@@ -67,6 +67,14 @@ HOST_NAME=www.example.com
 
 ## Deploying
 
+### Render
+
+The easiest way to deploy this service is to use the "Deploy to Render" button below. Using this button will create a new service on Render which you can configure. It will run on Render's Free service tier.
+
+<a href="https://render.com/deploy?repo=https://github.com/bikesky-social/bsky-community-bot">
+<img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" />
+</a>
+
 ### Docker
 
 This service is available on [Github Container Registry](https://github.com/bikesky-social/bsky-community-bot/pkgs/container/bsky-community-bot) and on [Docker Hub](https://hub.docker.com/r/bikesky/bsky-community-bot). You can run the container with the following command:
