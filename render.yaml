@@ -1,12 +1,10 @@
 services:
   - type: web
     name: bsky community bot
-    runtime: node
+    runtime: docker
     autoDeploy: true
-    plan: starter
+    plan: free
     envVars:
-      - key: BUN_VERSION
-        value: 1.2.8
       - key: LABELER_BSKY_USERNAME
         sync: false
       - key: LABELER_BSKY_APP_PASSWORD
@@ -29,10 +27,5 @@ services:
         sync: false
       - key: HOST_NAME
         sync: false
-      - key: PLAYWRIGHT_BROWSERS_PATH
-        value: /usr/lib/playwright
-    buildCommand: bun i --frozen-lockfile
-    preDeployCommand: bunx playwright install --with-deps chromium
-    startCommand: bun run start
     healthCheckPath: /health
 version: "1"
