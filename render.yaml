@@ -30,6 +30,7 @@ services:
       - key: HOST_NAME
         sync: false
     buildCommand: bun i --frozen-lockfile
+    preDeployCommand: bunx playwright install --with-deps chromium
     startCommand: bun run start
     healthCheckPath: /health
 version: "1"
