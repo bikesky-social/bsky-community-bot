@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: bsky community bot
+    runtime: node
+    autoDeploy: true
+    plan: free
+    envVars:
+      - key: BUN_VERSION
+        value: 1.2.8
+      - key: LABELER_BSKY_USERNAME
+        sync: false
+      - key: LABELER_BSKY_APP_PASSWORD
+        sync: false
+      - key: DEFAULT_LOCALE
+        sync: false
+      - key: PORT
+        sync: false
+      - key: MAX_POST_LENGTH
+        sync: false
+      - key: MAX_LABELS
+        sync: false
+      - key: LABEL_DISPLAY_COLUMNS
+        sync: false
+      - key: SELF_SERVE_LABELS
+        sync: false
+      - key: LABEL_VERIFICATION_EMAIL
+        sync: false
+      - key: USE_LABEL_WEBPAGE
+        sync: false
+      - key: HOST_NAME
+        sync: false
+    buildCommand: bun i --frozen-lockfile
+    startCommand: bun run start
+    healthCheckPath: /health
+version: "1"
