@@ -1,4 +1,4 @@
-var validUrl = require("valid-url");
+import { isUri } from "valid-url";
 
 export class Env {
   static getRequiredStringEnvVarOrThrow(key: string) {
@@ -32,7 +32,7 @@ export class Env {
   static getRequiredUriEnvVarOrThrow(key: string) {
     const result = Env.getRequiredStringEnvVarOrThrow(key);
 
-    if (validUrl.isUri(result)) {
+    if (isUri(result)) {
       return result;
     } else {
       throw `environment variable ${key} is not a valid URI. please enter a valid URI (eg. https://ozone.example.com)`;

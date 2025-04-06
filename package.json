@@ -54,7 +54,8 @@
     "@atproto/lex-cli": "^0.7.1",
     "@types/bun": "^1.2.8",
     "@types/express": "^5.0.1",
-    "@types/node-canvas-text": "^1.0.3"
+    "@types/node-canvas-text": "^1.0.3",
+    "@types/valid-url": "^1.0.7"
   },
   "peerDependencies": {
     "typescript": "^5.8.2"

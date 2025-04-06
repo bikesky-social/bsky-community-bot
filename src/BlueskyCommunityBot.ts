@@ -6,8 +6,9 @@ import * as CommandPrompt from "./lexicon/types/app/bikesky/communityBot/command
 import { LabelPoliciesKeeper } from "./LabelPoliciesKeeper";
 import i18n from "i18next";
 import Backend from "i18next-fs-backend";
-const fs = require("fs");
 import * as BskyCommunityBotLexicons from "./lexicon/lexicons";
+
+import { readdirSync } from "fs";
 
 export type SelfServeLabel = {
   identifier: string;
@@ -112,10 +113,10 @@ export class BlueskyCommunityBot {
       fallbackLng: this.options.defaultLocale,
       // debug: true,
       initAsync: false,
-      preload: fs.readdirSync(localesDir),
-      ns: fs
-        .readdirSync(`${localesDir}/${this.options.defaultLocale}`)
-        .map((fileName: string) => fileName.split(".")[0]),
+      preload: readdirSync(localesDir),
+      ns: readdirSync(`${localesDir}/${this.options.defaultLocale}`).map(
+        (fileName: string) => fileName.split(".")[0]
+      ),
       backend: {
         loadPath: `${localesDir}/{{lng}}/{{ns}}.json`,
       },
