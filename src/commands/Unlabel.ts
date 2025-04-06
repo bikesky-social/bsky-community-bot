@@ -6,7 +6,7 @@ import * as CommandPrompt from "../lexicon/types/app/bikesky/communityBot/comman
 import * as UnlabelDefs from "../lexicon/types/app/bikesky/communityBot/unlabelDefs";
 import * as BskyCommunityBotLexicons from "../lexicon/lexicons";
 import { type $Typed } from "../lexicon/util";
-const arrayEqual = require("array-equal");
+import equal from "array-equal";
 
 export class UnlabelCommand extends Command {
   commandName = "unlabel";
@@ -136,10 +136,8 @@ export class UnlabelCommand extends Command {
       );
 
       if (
-        arrayEqual(
-          selfServeLabelIdentifiers,
-          unlabelPrompt.labelIdentifiers
-        ) === false
+        equal(selfServeLabelIdentifiers, unlabelPrompt.labelIdentifiers) ===
+        false
       ) {
         const replyRef = await reply.reply({
           text: translate("error.labelsOutOfSync"),

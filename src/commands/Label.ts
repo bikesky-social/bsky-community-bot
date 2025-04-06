@@ -7,7 +7,7 @@ import * as CommandPrompt from "../lexicon/types/app/bikesky/communityBot/comman
 import * as LabelDefs from "../lexicon/types/app/bikesky/communityBot/labelDefs";
 import { type $Typed } from "../lexicon/util";
 import * as BskyCommunityBotLexicons from "../lexicon/lexicons";
-const arrayEqual = require("array-equal");
+import equal from "array-equal";
 
 export class LabelCommand extends Command {
   commandName = "label";
@@ -200,13 +200,15 @@ export class LabelCommand extends Command {
         );
 
       if (
-        arrayEqual(
+        equal(
           this.blueskyCommunityBot.labelPoliciesKeeper.getSelfServeLabelIdentifiers(),
           labelPrompt.labelIdentifiers
         ) === false ||
-        arrayEqual(
+        equal(
           this.blueskyCommunityBot.labelPoliciesKeeper.getVerifiedSelfServeLabelIdentifiers(),
           labelPrompt.verifiedLabelIdentifiers
+            ? labelPrompt.verifiedLabelIdentifiers
+            : []
         ) === false
       ) {
         const replyRef = await reply.reply({
