@@ -52,6 +52,7 @@
   },
   "devDependencies": {
     "@atproto/lex-cli": "^0.7.1",
+    "@types/array-equal": "^1.0.2",
     "@types/bun": "^1.2.8",
     "@types/express": "^5.0.1",
     "@types/node-canvas-text": "^1.0.3",

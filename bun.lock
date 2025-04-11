@@ -18,6 +18,7 @@
       },
       "devDependencies": {
         "@atproto/lex-cli": "^0.7.1",
+        "@types/array-equal": "^1.0.2",
         "@types/bun": "^1.2.8",
         "@types/express": "^5.0.1",
         "@types/node-canvas-text": "^1.0.3",
@@ -70,6 +71,8 @@
     "@skyware/jetstream": ["@skyware/jetstream@0.1.9", "", { "dependencies": { "@atcute/bluesky": "^1.0.6", "partysocket": "^1.0.2" } }, "sha512-87NGqRSmEYmvEuVY0DKZ2ZRbL72tExtDuV+PDvywYqukSp3F/it+9wnU5Xb/Is/pf+KSbd6lWvrnE31HgxJpJg=="],
 
     "@ts-morph/common": ["@ts-morph/common@0.25.0", "", { "dependencies": { "minimatch": "^9.0.4", "path-browserify": "^1.0.1", "tinyglobby": "^0.2.9" } }, "sha512-kMnZz+vGGHi4GoHnLmMhGNjm44kGtKUXGnOvrKmMwAuvNjM/PgKVGfUnL7IDvK7Jb2QQ82jq3Zmp04Gy+r3Dkg=="],
+
+    "@types/array-equal": ["@types/array-equal@1.0.2", "", {}, "sha512-JIs1LbghQHJOADiYJYDygi5okfe7P+kWrNtxKx8Fl6hVgv1GAhwUMunbMUIZFd4FnzGgdelVufst6eSCp4iYMA=="],
 
     "@types/body-parser": ["@types/body-parser@1.19.5", "", { "dependencies": { "@types/connect": "*", "@types/node": "*" } }, "sha512-fB3Zu92ucau0iQ0JMCFQE7b/dv8Ot07NI3KaZIkIUNXq82k4eBAqUaneXfleGY9JWskeS9y+u0nXMyspcuQrCg=="],
 
