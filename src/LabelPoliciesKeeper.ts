@@ -389,19 +389,7 @@ export class LabelPoliciesKeeper {
   }
 
   getLabelIndex(labelIdentifier: string): number {
-    if (this.labelerPolicies.labelValueDefinitions) {
-      for (
-        let i = 0;
-        i < this.labelerPolicies.labelValueDefinitions?.length;
-        i++
-      ) {
-        const labelDef = this.labelerPolicies.labelValueDefinitions[i];
-        if (labelDef.identifier === labelIdentifier) {
-          return i;
-        }
-      }
-    }
-    return -1;
+    return this.getSelfServeLabelIdentifiers().indexOf(labelIdentifier);
   }
 
   get1BasedLabelIndex(labelIdentifier: string): number {
