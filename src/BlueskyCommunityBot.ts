@@ -58,11 +58,7 @@ export class BlueskyCommunityBot {
 
   constructor(options: BlueskyCommunityBotOptions) {
     this.options = options;
-    this.chatBot = new Bot({
-      eventEmitterOptions: {
-        strategy: EventStrategy.Firehose,
-      },
-    });
+    this.chatBot = new Bot();
     if (
       this.options.devChatBotBskyUsername &&
       this.options.devChatBotBskyAppPassword
