@@ -243,12 +243,11 @@ export class LabelPoliciesKeeper {
 
     const element = await page.getByTitle("labels");
     const boundingBox = await element?.boundingBox();
-    console.log(`column width: ${boundingBox?.width}`);
 
     const width = boundingBox?.width ? boundingBox?.width : 0;
 
     await page.setViewportSize({
-      width: Math.round(width + 25),
+      width: Math.round(width*1.08),
       height: 1,
     });
 

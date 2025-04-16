@@ -51,9 +51,9 @@
     "test": "bun test"
   },
   "devDependencies": {
-    "@atproto/lex-cli": "^0.7.1",
+    "@atproto/lex-cli": "^0.7.2",
     "@types/array-equal": "^1.0.2",
-    "@types/bun": "^1.2.8",
+    "@types/bun": "^1.2.9",
     "@types/express": "^5.0.1",
     "@types/node-canvas-text": "^1.0.3",
     "@types/valid-url": "^1.0.7"
@@ -62,15 +62,15 @@
     "typescript": "^5.8.2"
   },
   "dependencies": {
-    "@atproto/api": "^0.14.16",
-    "@atproto/lexicon": "^0.4.9",
+    "@atproto/api": "^0.14.22",
+    "@atproto/lexicon": "^0.4.10",
     "@skyware/bot": "^0.3.11",
     "array-equal": "^1.0.2",
     "ejs": "^3.1.10",
     "express": "^4.21.2",
     "i18next": "^24.2.3",
     "i18next-fs-backend": "^2.6.0",
-    "image-size": "^2.0.1",
+    "image-size": "^2.0.2",
     "playwright": "^1.51.1",
     "valid-url": "^1.0.9"
   }
