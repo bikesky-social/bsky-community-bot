@@ -1,6 +1,6 @@
 {
   "name": "@bikesky/bsky-community-bot",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "license": "MIT",
   "description": "A Typescript package for running a community bot that people can send commands to by mentioning it in a Bluesky post.",
   "keywords": [
